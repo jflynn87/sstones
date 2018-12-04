@@ -1,0 +1,197 @@
+/*  applies to large screen sizes */
+
+@media only screen and (min-width: 501px){
+
+
+#picture {
+    border: 2px solid black;
+    height: 30%;
+    width: 100%;
+
+}
+
+.row-1 {
+  display: flex;
+  height: 10%;
+}
+/*
+.row-2 {
+  height: 700px;
+  width: 100%;
+  display: flex;
+
+}
+*/
+.row {
+  background-image: url("/static/images/stairs2.jpg");
+  background-size: 100% 100%;
+  /* color: #f4eb42; */
+  color: white;
+  font-weight: bold;
+  text-shadow: 0px 0px 3px #000, -1px -1px #000, 1px 1px #000;
+  padding-top: 35%;
+  padding-left: 40px;
+  background-repeat: no-repeat;
+  opacity: 1;
+
+
+}
+
+/*
+.pic {
+  height: 80%;
+  width: 100%;
+}
+*/
+
+.intro {
+  font-style: italic;
+  display: flex;
+
+}
+
+.intro_left {
+  flex: 50%;
+}
+
+.intro_right {
+  flex: 50%;
+}
+
+/*.message {
+  height:  40%;
+  width: 40%;
+  font-family: 'Lato', sans-serif;
+
+
+}
+*/
+.message h5 {
+  font-weight: 400 ;
+
+}
+
+.left {
+  padding-left: 2%;
+  flex: 30%;
+
+
+}
+
+.center {
+  flex: 30%;
+  padding-right: 2%;
+  padding-left: 2%;
+
+}
+
+.right {
+  flex: 30%;
+
+}
+
+.blink_me_left {
+  animation: blinker 1s linear 5;
+
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+
+.row-2 .row .text {
+
+    -webkit-animation: fadein 20s; /* Safari, Chrome and Opera > 12.1 */
+       -moz-animation: fadein 2s; /* Firefox < 16 */
+        -ms-animation: fadein 2s; /* Internet Explorer */
+         -o-animation: fadein 2s; /* Opera < 12.1 */
+            animation: fadein 10s;
+
+}
+
+@keyframes fadein {
+  0% {
+  visibility: hidden;
+  opacity: 0;
+}
+100% {
+  transition: visibility 1s linear 5s;
+  opacity: 1;
+}
+
+}
+
+/* Firefox < 16 */
+@-moz-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadein {
+  0% {
+  visibility: hidden;
+  opacity: 0;
+}
+100% {
+  visibility: visible;
+  transition-delay: 30s;
+  opacity: 1;
+}
+
+/* Internet Explorer */
+@-ms-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Opera < 12.1 */
+@-o-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+
+}
+
+.m-left {
+  visibility: hidden;
+  display: none;
+
+}
+
+.m-center {
+  visibility: hidden;
+  display: none;
+
+}
+}
+
+/*  applies to small screen sizes */
+
+
+@media only screen and (max-width: 500px) {
+.row {
+    background-image: url("/static/images/stairs2.jpg");
+    background-size: 100% 100%;
+    color: white;
+    font-weight: bold;
+    text-shadow: 0px 0px 3px #000, -1px -1px #000, 1px 1px #000;
+    padding-top: 35%;
+    background-repeat: no-repeat;
+    opacity: 1;
+  }
+
+.left {
+  visibility: hidden;
+  display: none;
+  }
+
+.center {
+  visibility: hidden;
+  display: none;
+  }
+}

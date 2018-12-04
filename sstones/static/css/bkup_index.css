@@ -1,0 +1,161 @@
+/*  applies to large screen sizes */
+
+@media (min-width: 500px){
+
+/* body, html {
+    height: 85%;
+    width: 100%;
+    padding-left: 5%;
+    padding-right: 5%;
+    font-family: 'Lato', sans-serif;
+  }
+html {
+    overflow: auto;
+  }
+page {
+    padding-left: 3%;
+    padding-right: 0%;
+  }
+ */
+
+
+#picture {
+    border: 2px solid black;
+    height: 60%;
+    width: 100%;
+
+}
+
+.intro {
+  font-style: italic;
+  display: flex;
+
+}
+
+.intro_left {
+  flex: 50%;
+}
+
+.intro_right {
+  flex: 50%;
+}
+
+.message {
+  height:  30%;
+  width: 100%;
+  font-family: 'Lato', sans-serif;
+
+}
+
+.message h5 {
+  font-weight: 400 ;
+
+}
+
+.left {
+  padding-left: 2%;
+  flex: 30%;
+
+}
+
+.center {
+  flex: 30%;
+  padding-right: 2%;
+  padding-left: 2%;
+
+}
+
+.right {
+  flex: 30%;
+
+}
+
+.blink_me_left {
+  animation: blinker 1s linear 5;
+
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+
+.message .row .text {
+
+    -webkit-animation: fadein 20s; /* Safari, Chrome and Opera > 12.1 */
+       -moz-animation: fadein 2s; /* Firefox < 16 */
+        -ms-animation: fadein 2s; /* Internet Explorer */
+         -o-animation: fadein 2s; /* Opera < 12.1 */
+            animation: fadein 10s;
+
+}
+
+@keyframes fadein {
+  0% {
+  visibility: hidden;
+  opacity: 0;
+}
+100% {
+  transition: visibility 1s linear 5s;
+  opacity: 1;
+}
+
+}
+
+/* Firefox < 16 */
+@-moz-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadein {
+  0% {
+  visibility: hidden;
+  opacity: 0;
+}
+100% {
+  visibility: visible;
+  transition-delay: 30s;
+  opacity: 1;
+}
+
+/* Internet Explorer */
+@-ms-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Opera < 12.1 */
+@-o-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+
+}
+}
+
+/*  applies to small screen sizes */
+
+@media screen and (max-width: 500px) {
+#picture {
+  border: 2px solid black;
+  height: 60%;
+  width: 100%;
+
+}
+
+.left {
+  color: black;
+
+}
+
+.right {
+  display: none;
+}
+
+
+}

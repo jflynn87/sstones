@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+
+
+{%block tittle_block%}
+  <title>Add Client - Stepping Stones</title>
+{%endblock%}
+
+
+{% block body_block%}
+{%load bootstrap%}
+{%if not form.instance.pk%}
+    <h2>Create New Client</h2>
+  {%else%}
+    <h2>Update Client Details</h2>
+  {%endif%}
+
+<form method="post">
+  {%csrf_token%}
+{{form|bootstrap}}
+{%if not form.instance.pk%}
+    <button type="submit" class="btn btn-primary">Create Client</button>
+  {%else%}
+  <table class="table">
+    <thead>
+      <th>Meeting Date</th>
+      <th>Items Discussed</th>
+      <th>Follow Ups</th>
+      <th>Payment Made?</th>
+    </thead>
+    <tbody>
+  {{formset.management_form}}
+  {%for form in notes%}
+    <tr>
+      <td>{{form.appointment}}</td>
+      <td>{{form.items_discussed}}</td>
+      <td>{{form.follow_ups}}</td>
+      <td>{{form.paid}}</td>
+      <td hidden>{{form.id}}</td>
+    </tr>
+    {%endfor%}
+    <br>
+</table>
+    <button type="submit" class="btn btn-primary">Update Client</button>
+  {%endif%}
+
+
+
+</form>
+<br>
+<br>
+{%endblock%}

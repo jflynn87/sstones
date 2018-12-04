@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+
+
+{%block tittle_block%}
+  <title>Thank You! - Stepping Stones</title>
+{%endblock%}
+
+
+{% block body_block%}
+<h1>Thank you, {{appt.client}}! We have received your request.</h1>
+<br>
+<table class='table'>
+{%if appt.date%}
+<tr>
+  <td>Date:</td>
+  <td>{{appt.date}}</td>
+</tr>
+<tr>
+  <td>Time:</td>
+  <td> {{appt.time}}</td>
+</tr>
+<tr>
+  <td>Location:</td>
+  <td>{{appt.get_location_display}}</td>
+</tr>
+{%endif%}
+{%if appt.comments%}
+<tr>
+  <td>Message:</td>
+  <td>{{appt.comments}}</td>
+</tr>
+{%endif%}
+<br>
+</table>
+<h4>You will receive an email shortly from steppingstonetk.gmail.com in response to your message.</h4>
+<br>
+<br>
+<br>
+<br>
+
+
+{%endblock%}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+{% block body_block%}
+
+<link rel="stylesheet" href={%static "css/days_list.css" %}>
+<a href="https://docs.google.com/spreadsheets/d/1FqhwcKz6EQUEvAMyP3ywPQMuba05hcc1v42XURThrwM/edit#gid=0"><button class="btn btn-primary">Update Expenses</button></a>
+<script type="text/javascript" src="{%static 'js/cal.js'%}"></script>
+{% if message %}
+  <div class="alert alert-danger">
+  <h2>{{message}}</h2>
+  </div>
+{%endif%}
+<br>
+<div class="row">
+  <div class="col">
+  <h4>Requests that require action:</h4>
+    <table class="table">
+      <thead>
+        <th>Date</th>
+        <th>Start Time</th>
+        <th>End Time</th>
+        <th>Status</th>
+        <th>Assigned to</th>
+        <th>Client</th>
+      </thead>
+      <tbody>
+        {%for appointment in appointments%}
+        <tr>
+        <td><a href="add_notes/{{appointment.client.id}}">{{appointment.date}}</td>
+        <td>{{appointment.time.start_time}}</td>
+        <td>{{appointment.time.end_time}}</td>
+        <td>Notes Required</td>
+        <td>{{appointment.client.coverage}}</td>
+        <td>{{appointment.client.name}}</td>
+
+        </tr>
+        {%endfor%}
+        {%for request in requests%}
+        <tr>
+            <td><a href="calendar/{{request.time.day.id}}">{{request.date}}</td>
+            <td>{{request.time.start_time}}</td>
+            <td>{{request.time.end_time}}</td>
+            <td>{{request.time.get_available_display}}</td>
+            <td>{{request.time.assigned_to}}</td>
+            <td>{{request.client.name}}</td>
+        </tr>
+        {%endfor%}
+      </tbody>
+    </table>
+</div>
+<div class="col">
+  <div class="embed-responsive embed-responsive-16by9">
+    <iframe class="embed-responsive-item"  src="https://calendar.google.com/calendar/embed?src=steppingstonetk%40gmail.com&ctz=Asia%2FTokyo" style="border: 0" frameborder="0" scrolling="no"></iframe>
+  </div>
+</div>
+
+</div>
+<div class="row">
+<div class="col">
+
+
+  <form method="POST">
+     {%csrf_token%}
+
+  <h4>Select dates to block on the booking calendar  <button type="submit" class="btn btn-primary" "btn-block">Click to Save Updates</button>  </h4>
+  <table id="cal_table" class="table">
+    <thead>
+        <th>Day</th>
+        <th>Date</th>
+        <th>Check to close</th>
+        <th>Notes (optional)</th>
+    </thead>
+    <tbody>
+   {{formset.management_form}}
+    {%for form in formset%}
+      <tr>
+        <td style="display:none">{{ form.id }}</td>
+        <td id="display_day{{forloop.counter}}"> </td>
+        <td>{{form.day}} <a href="calendar/{{form.instance.pk}}">Slots</td>
+        <td>{{form.closed}}</td>
+        <td>{{form.note}}</td>
+      </tr>
+      </tbody>
+      {%endfor%}
+  </table>
+</div>
+  </form>
+
+
+</div>
+  <br>
+
+</div>
+</div>
+
+
+{%endblock%}

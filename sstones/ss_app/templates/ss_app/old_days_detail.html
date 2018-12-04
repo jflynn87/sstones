@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+{% block body_block%}
+
+
+<script type="text/javascript" src="{%static 'js/slots.js'%}"></script>
+
+{{form.errors}}
+{% if form.errors %}
+    {% for field in form %}
+        {% for error in field.errors %}
+            <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+        <div class="alert alert-danger">
+            <strong>{{ error|escape }}</strong>
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+<h1 onload="choices()">Turn Off Time slots by clicking </h1>
+
+<h2>Date:  {{days.day}}</h2>
+
+<table id=table class="table">
+  <thead>
+    <th>Start Time</th>
+    <th>End Time</th>
+    <th>Client</th>
+    <th hidden>Status</th>
+    <th hidden>Assigned To</th>
+    <th>Change Status</th>
+    <th>Assign To</th>
+    <th hidden>Saved Comments</th>
+    <th>Comments</th>
+  </thead>
+  <tbody id=tbody>
+  <tr>
+    {%for slot in slots%}
+    <td>{{slot.start_time}}</td>
+    <td>{{slot.end_time}}</td>
+    {%for client in slot.appt.all%}
+    <td>{{client}}</td>
+    {%endfor%}
+    <td id=status{{forloop.counter}} hidden>{{slot.available}}</td>
+    <td  hidden>{{slot.get_available_display}}</td>
+    <td id=assigned_to{{forloop.counter}} hidden>{{slot.assigned_to.id}}</td>
+    <form method="POST">
+      {%csrf_token%}
+    <td value={{slot.pk}} id=change_status{{forloop.counter}}>{{form.available}} </td>
+
+    <td value={{slot.pk}} id=staff{{forloop.counter}}>{{form.assigned_to}} </td>
+    <td id=db_comments{{forloop.counter}} hidden>{{slot.comments}}</td>
+    <td value={{slot.pk}} id=comments{{forloop.counter}}>{{form.comments}}</td>
+  </tr>
+    {%endfor%}
+  </tbody>
+  </table>
+
+  <input type="submit" value="Submit Changes" class="btn btn-primary">
+  </form>
+
+
+  {%endblock%}

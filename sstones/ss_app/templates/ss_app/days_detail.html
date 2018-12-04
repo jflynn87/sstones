@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+{% block body_block%}
+
+
+<script type="text/javascript" src="{%static 'js/slots.js'%}"></script>
+
+{{form.errors}}
+{% if form.errors %}
+    {% for field in form %}
+        {% for error in field.errors %}
+            <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+        <div class="alert alert-danger">
+            <strong>{{ error|escape }}</strong>
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+<h1>Schedule</h1>
+
+<h2>Date:  {{day.day}}</h2>
+<p hidden id="day_id">{{day.id}}</p>
+
+<table id=table class="table">
+  <thead>
+    <th>Start Time</th>
+    <th>End Time</th>
+    <th>Client</th>
+    <th>Change Status</th>
+    <th>Assign To</th>
+    <th>Our Comments</th>
+  </thead>
+  <tbody id=tbody>
+  <tr>
+    <form method="post">
+      {%csrf_token%}
+      {{formset.management_form}}
+    {%for form in formset%}
+    <td style="display:none">{{ form.id }}</td>
+    <td>{{form.start_time}}</td>
+    <td>{{form.end_time}}</td>
+    <td id=client{{forloop.counter}}></td>
+    <td>{{form.available}}</td>
+    <td>{{form.assigned_to}}</td>
+    <td>{{form.comments}}</td>
+    </tr>
+    {%endfor%}
+</tbody>
+</table>
+  <input type="submit" value=" Submit Changes" class="btn btn-primary">
+  </form>
+
+
+  {%endblock%}

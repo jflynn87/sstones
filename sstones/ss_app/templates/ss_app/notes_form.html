@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+
+
+{%block tittle_block%}
+  <title>Notes - Stepping Stones</title>
+{%endblock%}
+
+
+{% block body_block%}
+{%load bootstrap%}
+
+
+{% if form.errors %}
+{% for error in form.non_field_errors %}
+    <div class="alert alert-danger">
+        <strong>{{ error|escape }}</strong>
+    </div>
+{% endfor %}
+{% for error in form.errors %}
+    <div class="alert alert-danger">
+        <strong>{{ error|escape }}</strong>
+    </div>
+{% endfor %}
+
+{% endif %}
+
+
+
+<h1>Notes Update Page</h1>
+
+<h4> <a href="{% url 'ss_app:update_client' pk=client.pk %}">  Client: {{client.name}} </a></h4>
+<p>Focus Areas:</p>
+<ul>
+    {%for focus in client.focus_areas.all %}
+    <li>{{focus}}</li>
+     {%endfor%}
+</ul>
+<p>Coverage:  {{client.coverage}}</p>
+<table class='table'>
+  <thead>
+    <th>Meeting Date</th>
+    <th>Items Discussed</th>
+    <th>Follow Ups</th>
+    <th>Payment Made?</th>
+  </thead>
+  <tbody>
+  <form method="post" >
+    {%csrf_token%}
+  {{formset.management_form}}
+  {%for form in formset%}
+  {{form.errors}}
+    <tr>
+      <td>{{form.appointment}}</td>
+      <td>{{form.items_discussed}}</td>
+      <td>{{form.follow_ups}}</td>
+      <td>{{form.paid}}</td>
+      <td hidden>{{form.id}}</td>
+    </tr>
+
+    {%endfor%}
+  </tbody>
+</table>
+
+    <button type="submit" class="btn btn-primary">Save Notes</button>
+</form>
+<br>
+<br>
+{%endblock%}

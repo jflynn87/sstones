@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+
+
+{%block tittle_block%}
+  <title>Service Offerings - Stepping Stones</title>
+{%endblock%}
+
+
+{% block body_block%}
+
+<link rel="stylesheet" href={%static "css/services.css" %}>
+<script type="text/javascript" src="{%static 'js/services.js'%}"></script>
+<hr>
+
+<div class="title">
+  <div class="packages">
+    <h3>Topics to Consider</h3>
+    <button class="btn btn-primary btn-block" id='opt1'>Core Skill Development</button>
+    <p></p>
+    <button class="btn btn-primary btn-block" id='opt2'>Career Management</button>
+    <p></p>
+    <button class="btn btn-primary btn-block" id='opt3'>Management/Leadership</button>
+    <p></p>
+    <button class="btn btn-primary btn-block" id='opt4'>English - Professional Impact</button>
+  </div>
+  <div class="middle">
+    <p hidden>middle</p>
+
+  </div>
+  <div class="desc intro" id="intro">
+    <h3>Click to View Topics</h3>
+
+  </div>
+  <div class="desc" id="desc1" hidden>
+    <h3>Core Skill Development</h3>
+    <ul>
+    <li>Developing Strategies and Ideas</li>
+    <li>Time Management/Organization</li>
+    <li>Communication</li>
+    <li>Presentation Skills</li>
+    <li>Presence, Impact and Influence</li>
+    <li>Building a Personal Brand</li>
+    <li>Develop Opinions and Pushing Back</li>
+    </ul>
+
+  </div>
+  <div class="desc" id="desc2" hidden>
+    <h3>Career Management</h3>
+    <ul>
+    <li>Success in  a Cross Cultural Environment</li>
+    <li>Start of Career Success Criteria</li>
+    <li>Mid Career Success Criteria</li>
+    <li>Transition Periods</li>
+    </ul>
+  </div>
+  <div class="desc" id="desc3" hidden>
+    <h3>Management and Leadership </h3>
+    <ul>
+      <li>Success in Management</li>
+      <li>Building a Strong Team</li>
+      <li>Communication</li>
+      <li>Creating the Right Culture</li>
+      <li>Challenging Periods</li>
+      <li>Incident and Crisis Management</li>
+      <li>Risk and Red Flag Identification</li>
+      <li>People Development</li>
+
+    </ul>
+
+  </div>
+  <div class="desc" id="desc4" hidden>
+    <h3>English - Professional Impact</h3>
+    <ul>
+      <li>Interviewing (Riving and Receiving)</li>
+      <li>Leading Meetings/Conference Calls</li>
+      <li>Providing Opinions/Suggestions/Thoughts</li>
+      <li>Presenting/Messaging with Impact/Presence</li>
+      <li>Interacting wiht Senior Leaders</li>
+
+    </ul>
+
+  </div>
+
+</div>
+
+
+<hr>
+<div class="row">
+  <div class="column">
+    <div class="body-img">
+    <h4>One to One</h4>
+    <img id="body-img" src="/static/images/one.jpg" alt="">
+    </div>
+      <div id="pop">
+        <ul>
+          <br>
+          <li class="nob">Single Sessions - Ideal for advice on specific issues/areas</li>
+          <li class='bullets'>1 Hour - 10,000 Yen </li>
+          <li class='bullets'>30 Minutes - 5,000 Yen</li>
+          <p></p>
+          <li class='nob'>5 Meeting Package - Ideal for work on complex skills/issues</li>
+          <li class='bullets'>1 Hour Per Meeting - 40,000 Yen Total</li>
+          <li class='bullets'>30 Minutes Per Meeting - 20,000 Yen Total</li>
+          <p></p>
+          <li class='nob'>10 Meeting Package - Focus on multiple skills or complex issues</li>
+          <li class='bullets'>1 Hour Per Meeting - 70,000 Yen Total</li>
+          <li class='bullets'>30 Minutes Per Meeting - 35,000 Yen Total</li>
+          <p></p>
+          <li class='nob'>Longer-Term Relationship for Professionals and Students</li>
+          <li class='bullets'>6 Months (15 meeting maximum - 125,000 Yen)</li>
+          <li class='bullets'>1 Year (30 meeting maximum - 250,000 Yen)</li>
+          <p></p>
+          <p></p>
+          <li class='footnote'>Note: For multiple meeting packages, will provide an initial meeting to determine the best development program or package.</li>
+          <li class='nob'>Click <a href="{% url 'ss_app:appt' %}">here to contact us</a></li>
+          <br>
+        </ul>
+    </div>
+  </div>
+
+  <div class="column">
+    <div class="body-img">
+        <h4>Group Sessions</h4>
+        <img id="body-img" src="/static/images/group.jpg" alt="">
+    </div>
+    <div id="pop">
+      <ul>
+        <br>
+        <li class="nob">Group sessions allow for a more collaborative experience on skills and career development.
+        Interaction with others offers chances for you to listen to different perspectives.
+        <p></p>
+        <li class='nob'>We will be as flexible as possible to accommodate your needs.</li>
+        <p></p>
+        <li class='nob'>Form your own group (Up to 10 individuals)</li>
+        <li class='bullets'>Sessions can be either presentation with Q&A or  pure discussion style.</li>
+        <li class='bullets'>Preferential pricing available.</li>
+        <p></p>
+        <li class='nob'>Join one of our pre-arranged sessions</li>
+        <li class='bullets'>Sessions will be either presentation with Q&A or pure discussion style.</li>
+        <li class='bullets'>Preferential pricing available.</li>
+        <p></p>
+        <li class='nob'>Click <a href="{% url 'ss_app:appt' %}">here to contact us</a></li>
+        <br>
+        </ul>
+
+    </div>
+  </div>
+
+  <div class="column">
+    <div class="body-img">
+    <h4>Company Specific Programs</h4>
+    <img id="body-img2" src="/static/images/custom.jpg" alt="">
+    </div>
+    <div id="pop">
+      <ul>
+        <br>
+        <li class='nob'>In-house sessions can be an effective way to bring teams together through training and development.</li>
+                <p></p>
+        <li class='nob'>We will work with you to customize content based on your strategic focus areas.</li>
+        <p></p>
+        <li class='nob'>Click <a href="{% url 'ss_app:appt' %}">here to contact us</a></li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+{%endblock%}

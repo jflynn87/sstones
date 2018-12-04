@@ -1,0 +1,143 @@
+/*  applies to large screen sizes */
+
+@media (min-width: 1000px){
+
+
+hr {
+        display: block;
+        size: 30px;
+        width: 100%;
+        background-color: #365d9b;
+      }
+
+
+#teampic {
+    height: 100%%;
+    width: 96%;
+
+}
+
+.row {
+  padding-top: 20px;
+  display: flex;
+}
+
+.middle {
+  display: flex;
+}
+
+.left-column {
+  padding-left: 30px;
+  padding-right: 40px;
+  flex: 60%
+
+}
+
+.right-column {
+  width: 100%;
+  flex: 40%;
+}
+
+.bios {
+  display: flex;
+}
+/*
+.left_bio {
+  display: flex;
+  flex: 33%
+}
+*/
+.left_pic {
+  flex: 30%;
+}
+
+.left_text {
+  flex:55%;
+
+}
+
+.margin {
+  flex:10%;
+}
+
+.ourpics {
+    border: 1px solid #4289f4; /* Gray border */
+    border-radius: 4px;  /* Rounded border */
+    padding: 5px; /* Some padding */
+    width: 150px ; /* Set a small width  was 150px */
+    height: 150px;
+    /*height: 50%;*/
+}
+
+.highlights {
+  display: flex;
+}
+
+.left_highlight {
+  flex: 33%;
+  }
+
+
+.center_highlight {
+    flex: 33%;
+    }
+
+
+.right_highlight {
+      flex: 33%;
+      }
+
+
+p {
+  padding-right: 15px;
+
+}
+
+.lightfont {
+  font-family: Fira+Sans:100;
+  font-size: 30px;
+}
+
+}
+
+/*  applies to small screen sizes */
+
+@media (max-width: 999px) {
+
+
+#teampic {
+    height: 60%;
+    width: 100%;
+
+}
+
+.bottom {
+  height: 10%;
+  width: 100%
+  display: flex;
+}
+
+.row {
+
+  display: flex;
+}
+
+
+.left-column {
+  flex: 40%
+
+}
+
+.right-column {
+  width: 100%;
+  flex: 60%;
+}
+
+
+.ourpics {
+    border: 3px solid #ddd; /* Gray border */
+    border-radius: 4px;  /* Rounded border */
+    padding: 2px; /* Some padding */
+    width: 30%; /* Set a small width */
+}
+}

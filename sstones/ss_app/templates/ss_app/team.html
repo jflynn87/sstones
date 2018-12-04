@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+
+
+{%block tittle_block%}
+  <title>The Team - Stepping Stones</title>
+{%endblock%}
+
+{% block body_block%}
+
+<link rel="stylesheet" href={%static "css/team.css" %}>
+
+<hr>
+
+<div class="row">
+    <div class="left-column">
+        <h4 class="lightfont">Who We Are</h4>
+        <ul>
+          <li>Over 50 years of collective working experience at Goldman Sachs.</li>
+          <li>Multi-cultural management experience in Tokyo, New York, London, Bengaluru. </li>
+          <li>Senior positions with regional and global management responsibilities.</li>
+          <li>Mentored and coached hundreds of professional staff from junior/mid-level positions to senior management roles.</li>
+          <li>Created and fostered working environments to allow individuals to achieve their highest goals/ambitions.</li>
+          <li>Extensive people and business management experience translates into an effective “nothing surprises us” approach.</li>
+
+        </ul>
+
+    </div>
+    <div class="right-column">
+      <img id="teampic" src={%static "images/map.jpg" %} alt=""> </div>
+</div>
+<div class="middle">
+<br>
+<br>
+<br>
+<hr>
+<br>
+<br>
+</div>
+
+
+<div class="bios">
+  <br>
+  <br>
+  <div class="left-pic">
+    <img class="ourpics" src="/static/images/jimmy.jpg" alt="">
+  </div>
+  <div class="margin">
+  </div>
+  <div class="left-text">
+    <h3>  Jimmy Carlberg</h3>
+    <p>I graduated from Columbia University in New York City with a BA in Economics.  After graduating, I began a long and successful career in the financial industry by working for a top investment bank in New York.  I’ve managed at a senior level in Tokyo, New York, London, and Bengaluru.  I’ve lived and worked in Tokyo for over 20 years, where I also coached baseball for 6 years.  I love all sports, play golf enthusiastically, and support the Chicago Cubs and the Tokyo Giants.</p>
+  </div>
+</div>
+<div class="bios">
+  <br>
+  <br>
+    <div class="left-pic">
+      <img class="ourpics"  src="/static/images/john.jpg" alt="">
+    </div>
+    <div class="margin">
+    </div>
+    <div class="left-text">
+      <h3>John Flynn</h3>
+      <p>I graduated from St. Joseph’s University in Philadelphia with a BA in Marketing and began my career in Technology.  After 5 years, I joined a top-tier investment bank in the Finance industry in New York.  After New York, I decided to make Tokyo my home, where I’ve lived and worked at a senior management level for 20 years.  Sports is the other half of my life - in addition to being an avid New York Mets and Giants fan, I have also run 12 marathons in my life and play tons of golf.</p>
+    </div>
+
+  </div>
+
+<div class="bios">
+  <br>
+  <br>
+  <div class="left-pic">
+      <img class="ourpics"  src="/static/images/kurumi.jpg" alt="">
+    </div>
+    <div class="margin">
+    </div>
+    <div class="left-text">
+      <h3>Kurumi Onose</h3>
+      <p>I graduated from Waseda University in Tokyo during my employement with several financial insitutions, both domestic and international, in Japan.  In addition, while working in international firms, I was able to significantly improve my English skills over a ten year period.  I enjoy Kendo and achery and play golf when I am not spending time with my two children, who keep me very busy.  I also enjoy visiting my home town in Aomori Prefecture as often as possible.  </p>
+    </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+{%endblock%}

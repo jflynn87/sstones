@@ -1,0 +1,81 @@
+/*  applies to large screen sizes */
+
+.navbar {
+  padding-top: 10px;
+  background-color: white;
+
+}
+
+.nav-item  {
+  color: black;
+  font-family: 'Lato', sans-serif;
+  font-weight: bold;
+
+}
+
+.navbar-brand {
+  padding-top: 0px;
+  padding-right: 60px;
+  padding-left: 0%;
+
+}
+
+body, html {
+  height: 85%;
+  width: 100%;
+  padding-left: 5%;
+  padding-right: 5%;
+  font-family: 'Lato', sans-serif;
+
+
+}
+
+html {
+  overflow: auto;
+}
+
+page {
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+
+footer .footer {
+  padding-top: 10px;
+  background: 		black;
+  color: white;
+  position: relative;
+  width: 100%;
+  bottom: 0;
+
+}
+
+
+
+p {
+    font-family: 'Lato', sans-serif;
+
+}
+
+
+h4 {
+    font-family: 'Lato', sans-serif;
+
+}
+
+
+h5 {
+    font-family: 'Lato', sans-serif;
+
+}
+
+h1 {
+  font-family: 'Lato', sans-serif;
+}
+
+hr {
+      display: block;
+      size: 30px;
+      width: 100%;
+      background-color: #365d9b;
+    }

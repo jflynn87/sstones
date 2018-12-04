@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+
+
+{%block tittle_block%}
+  <title>Client List - Stepping Stones</title>
+{%endblock%}
+
+<h1>Client List</h1>
+
+{% block body_block%}
+<table class="table">
+<thead>
+<th>Name</th>
+<th>email</th>
+<th>Phone</th>
+<th>Coverage Person</th>
+
+</thead>
+<tbody>
+  {%for client in object_list%}
+  <tr>
+    <td> <a href="{% url 'ss_app:update_client' pk=client.pk %}"> {{client.name}} </a></td>
+    <td>{{client.email}}</td>
+    <td>{{client.phone}}</td>
+    <td>{{client.coverage}}</td>
+
+  </tr>
+  {%endfor%}
+</tbody>
+</table>
+
+{%endblock%}

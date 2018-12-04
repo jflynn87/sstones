@@ -1,0 +1,225 @@
+/*  applies to large screen sizes */
+
+@media (min-width: 450px){
+
+#picture {
+    border: 2px solid black;
+    padding: 25px;
+    background: url("/static/images/upstairs-large.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100%;
+    width: 100%
+
+}
+
+
+#teampic {
+    height: 30%%;
+    width: 80%;
+
+}
+
+
+.individual {
+  height: 35%;
+  width: 20%;
+}
+
+.row {
+  padding-top: 20px;
+  display: flex;
+}
+
+.left-column {
+  padding-left: 70px;
+  padding-right: 40px;
+  flex: 40%
+
+}
+
+.right-column {
+  width: 100%;
+  flex: 60%;
+}
+
+.left-team {
+  padding: 20px;
+  flex:33%
+}
+
+.center-team {
+  flex:33%
+}
+
+.right-team {
+  flex: 33%
+}
+
+
+.ourpics {
+  height: 50%;
+  width: 30%;
+
+}
+
+.column {
+  padding-left: 75px;
+  padding-right: 65px
+}
+
+h1  {
+  font-family: 'Markazi Text', serif;
+  color: black;
+  padding-top: 50px;
+  font-size: 60px;
+
+
+}
+
+.lightfont {
+  font-family: Fira+Sans:100;
+  font-size: 30px;
+}
+
+.lightbody {
+  font-family: Fira+Sans:100;
+
+  padding-left: 30px;
+}
+
+h4 {
+  font-family: 'Markazi Text', serif;
+  font-weight: bold;
+}
+
+.pictext {
+  font-family: 'Markazi Text', serif;
+  color: black;
+  display: flex;
+}
+
+
+.left {
+  flex: 30%;
+
+}
+
+.center {
+  flex: 40%;
+}
+
+.right {
+  flex: 30%;
+}
+
+
+.navbar {
+  padding-top: 10px;
+  background-color: white;
+  color: red
+
+
+}
+
+.nav-item  {
+  color: gray;
+  font-family: 'Abril Fatface', cursive;
+  font-size: 15px;
+}
+
+.navbar-brand {
+  color: black;
+  font-family: 'Abril Fatface', cursive;
+  font-size: 30px;
+  padding-top: 0px;
+  padding-left: 40px;
+
+
+}
+
+
+}
+
+/*  applies to small screen sizes */
+
+@media (max-width: 450px) {
+  #picture {
+  border: 2px solid black;
+  padding: 25px;
+  background: url("/static/images/upstairs-small.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 80%;
+  width:100%;
+
+}
+  .footer {
+  padding-top: 10px;
+  height: 10%;
+  background: black;
+  color: white;
+  width: 100%;
+}
+
+h1  {
+  font-family: 'Markazi Text', serif;
+  color: black;
+
+}
+
+.pictext {
+  font-family: 'Markazi Text', serif;
+  color: black;
+
+}
+
+.left {
+  color: black;
+
+}
+.navbar {
+
+}
+
+.right {
+  display: none;
+}
+
+
+
+#teampic {
+    height: 30%%;
+    width: 80%;
+
+}
+
+
+.individual {
+  height: 35%;
+  width: 20%;
+}
+
+
+}
+
+/*  applies to all screen sizes */
+
+body, html {
+  height: 100%;
+  width: 100%
+
+}
+
+html {
+  overflow: auto;
+}
+
+
+.footer {
+  padding-top: 10px;
+  height: 10%;
+  background: black;
+  color: white;
+  width: 100%;
+}

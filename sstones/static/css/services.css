@@ -1,0 +1,269 @@
+
+@media screen and (min-width: 1000px){
+
+
+hr {
+        display: block;
+        size: 30px;
+        width: 100%;
+        background-color: #365d9b;
+      }
+
+.row {
+    display: flex;
+  }
+
+.column {
+    width: 33%;
+    position: flex;
+}
+
+#pop {
+  position: flex;
+
+/*  transition: .2s;*/
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 30px;
+  background-color: #e6e6e6;
+  height: 75%;
+  width: 90%;
+
+}
+/*
+footer .footer {
+  padding-top: 10px;
+  background: 		black;
+  color: white;
+  position: static;
+  width: 100%;
+  bottom: 0;
+*/
+
+/*
+#pop:hover {
+  position: relative;
+  bottom: +70px;
+  right: +70px;
+  /*left: +80px;
+  font-weight: bold;
+  font-size: 125%;
+  z-index: 1;
+}
+*/
+.title {
+/*  height: 60%;*/
+  display: flex;
+}
+
+.packages {
+  flex: 15%;
+  padding-right: 10px;
+}
+.middle {
+  flex: 5%;
+}
+.desc {
+  flex: 70%;
+/*  background-color: lightblue;*/
+  border: 1px;
+  border-radius: 25px;
+  border-style:  solid;
+  /*border-color: #0044cc;*/
+  border-color: black;
+  padding-left: 15px;
+  padding-top: 10px;
+  background-image: url("/static/images/duderunning.jpg")
+
+
+}
+
+.intro {
+  padding-top: 70px;
+
+}
+
+
+h4 {
+    text-align: center;
+  }
+
+.body-img {
+  display: relative;
+  height: 25%;
+}
+
+#body-img {
+  width:  90%;
+  height: 100%;
+  border: 1px solid black;
+
+}
+
+#body-img2 {
+  width:  90%;
+  height: 100%;
+  border: 1px solid black;
+
+}
+
+
+}
+
+
+
+
+
+@media screen and (max-width: 999px) {
+
+
+.body-img {
+    display: relative;
+    height: 25%;
+  }
+
+#body-img {
+    width:  100%;
+    height: 80%;
+    border: 1px solid black;
+
+  }
+
+
+#body-img2 {
+      width:  100%;
+      height: 70%;
+      border: 1px solid black;
+
+    }
+
+
+.row {
+      display: flex;
+    }
+
+.column {
+      display: flex;
+      flex-direction: column;
+  }
+
+#pop {
+  position: relative;
+  background-color: #e6e6e6;
+  height: 90%;
+  width: 100%;
+  padding-left: 0;
+  padding-top: 10px;
+
+}
+
+h4 {
+  text-align: center;
+}
+
+}
+/* all screen sizes */
+
+
+
+
+.nob {
+  font-weight: bold;
+  list-style: none;
+  padding-left: 0px;
+
+}
+
+.bullets {
+  list-style-position: inside;
+  padding-left: 15px;
+}
+
+
+.footnote {
+  font-style: italic;
+  color: #3399ff;
+}
+
+
+/* css for fade in section */
+#section-3 {
+	position:relative;
+	float:left;
+	width:100%;
+	height:300px;
+/*	background:#202020; */
+  background: #99ccff;
+	border-bottom:solid 1px #000;
+}
+
+#section-3 .container {
+	position:relative;
+	float:left;
+	height:100%;
+}
+
+.info-slide {
+	position:absolute;
+/*	bottom:0;  */
+  top: 0;
+	float:left;
+	width: 95%;
+	height:60px;
+	cursor:pointer;
+	overflow:hidden;
+	text-align:center;
+
+	transition: height .4s ease-in-out;
+    -webkit-transition: height .4s ease-in-out;
+    -moz-transition: height .4s ease-in-out;
+
+}
+
+.info-slide:hover, .info-slide:active{
+	height:350px;
+}
+
+#section-3 .container h1 {
+	float:left;
+	padding:20px 0;
+	font-size:20px;
+	width:100%;
+/*	color:#12647f;*/
+	background:#6699ff;
+  color: #fff;
+/*  background: #0044cc; */
+    height:50px;
+}
+
+#section-3 .container li {
+	float:left;
+/*	padding:5% 10%; */
+	font-size:16px;
+	bottom:0;
+	width:80%;
+	color:#000;
+  filter: brightness(2);
+}
+
+#section-3 #btn1 {
+	width:33%;
+}
+
+#section-3 #btn2 {
+	width:34%;
+	border-left:solid 1px #000;
+	box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    -webkit-box-sizing:border-box;
+}
+
+#section-3 #btn3 {
+	width:33%;
+	border-left:solid 1px #000;
+	box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    -webkit-box-sizing:border-box;
+}
+
+/* end of fade in css */
