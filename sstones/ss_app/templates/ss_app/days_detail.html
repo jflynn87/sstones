@@ -4,6 +4,8 @@
 {% block body_block%}
 
 
+
+
 <script type="text/javascript" src="{%static 'js/slots.js'%}"></script>
 
 {{form.errors}}
@@ -22,6 +24,11 @@
     {% endfor %}
 {% endif %}
 
+{%for formset, appt in display_list%}
+
+<p>{{formset}}  {%for client_name, pk in appt.items%}{{client_name}}{%endfor%} </p>
+{%endfor%}
+
 
 <h1>Schedule</h1>
 
@@ -36,21 +43,31 @@
     <th>Change Status</th>
     <th>Assign To</th>
     <th>Our Comments</th>
+    <th>Client Detail Page</th>
   </thead>
   <tbody id=tbody>
   <tr>
     <form method="post">
       {%csrf_token%}
+
       {{formset.management_form}}
     {%for form in formset%}
+
+
     <td style="display:none">{{ form.id }}</td>
     <td>{{form.start_time}}</td>
     <td>{{form.end_time}}</td>
-    <td id=client{{forloop.counter}}></td>
+    <!-- <td id=client{{forloop.counter}}></td> -->
+
+    <td>{{appt.client__name}}</td>
+
     <td>{{form.available}}</td>
     <td>{{form.assigned_to}}</td>
     <td>{{form.comments}}</td>
+
+    <td><a href="{% url 'ss_app:update_client' pk=1 %}"> <button class='btn btn-primary' type="button" ></button></a></td>
     </tr>
+
     {%endfor%}
 </tbody>
 </table>

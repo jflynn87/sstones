@@ -21,6 +21,7 @@ from httplib2 import Http
 from oauth2client import file, client, tools
 
 from django.http import JsonResponse
+from django.core import serializers
 import json
 
 # If modifying these scopes, delete the file token.json.
@@ -99,7 +100,8 @@ class CalView(LoginRequiredMixin, TemplateView):
     def get_appt_list(self):
         appointment_list = []
 
-        for appt in Appointment.objects.filter(date__lte=datetime.datetime.now().date()):
+        for appt in Appointment.objects.filter(date__lte=datetime.datetime.now().date(), \
+           time__available="B"):
             print ('appt', appt.client)
             if Notes.objects.filter(appointment=appt,\
             items_discussed__isnull=False).exists():
@@ -149,11 +151,17 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         day = Days.objects.get(pk=kwargs.get('pk'))
         formset  = SlotsFormSet(queryset=TimeSlots.objects.filter(day=day).order_by('start_time'))
+        appt_list = []
+        for slot in TimeSlots.objects.filter(day=day).order_by('start_time'):
+            appt = Appointment.objects.filter(time__pk=slot.pk).values('client__name', 'client__pk')
+            appt_list.append(list(appt))
+        display_list = zip(formset, appt_list)
         context.update({
         'day': day,
         'formset': formset,
-
-        })
+        'appt_list': appt_list,
+        'display_list': display_list,
+                })
         print (context)
         return (context)
 
@@ -278,28 +286,22 @@ def appt_get_client(request):
 
 
 def get_client(request):
-    if request.is_ajax():
-        client_list = []
-        slots = TimeSlots.objects.filter(day__pk=request.GET.get('activity')).order_by('start_time')
-
-        for slot in slots:
-            try:
-                appt = Appointment.objects.get(time__pk=slot.pk)
-                client_list.append(appt.client.name)
-                print (slot.pk, appt.time)
-            except ObjectDoesNotExist:
-                client_list.append("n/a")
-            except Exception as e:
-                client_list.append('lookup issue')
-                print ('client lookup issue', e)
-
-        data = json.dumps(client_list)
-        return HttpResponse(data, content_type="application/json")
-    else:
-        print ('not ajax')
-        raise Http404
-
-    return slots
+    pass
+    # if request.is_ajax():
+    #     slots = TimeSlots.objects.filter(day__pk=request.GET.get('activity')).order_by('start_time')
+    #     appt_list = []
+    #     for slot in slots:
+    #         appt = Appointment.objects.filter(time__pk=slot.pk).values('client__name', 'client__pk')
+    #         appt_list.append(list(appt))
+    #
+    #     data = json.dumps(appt_list)
+    #     print (data)
+    #     return HttpResponse(data, content_type="application/json")
+    # else:
+    #     print ('not ajax')
+    #     raise Http404
+    #
+    # return slots
 
 
 class AppointmentCreateView(CreateView):
@@ -444,13 +446,60 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(ClientUpdateView, self).get_context_data(**kwargs)
+        data = self.build_view()
+        context.update({
+        #'client': data[0],
+        'notes_formset': data[1],
+        'old_notes': data[2],
+        })
+        return context
+
+    def post(self, request, **kwargs):
+        client_form = CreateClientForm(self.request.POST)
+        notes_formset = CreateNotesFormSet(self.request.POST)
+
+        if notes_formset.is_valid() and client_form.is_valid():
+            for form in notes_formset:
+                if form.is_valid():
+                    form.save()
+                else:
+                    print ('invalid note form', form)
+            client_form.save()
+        else:
+            print ('invalid formset', notes_formset)
 
         client = Client.objects.get(pk=self.kwargs.get('pk'))
         notes = CreateNotesFormSet(queryset=Notes.objects.filter(appointment__client=client).order_by('-appointment__date'))
-        context.update({
-        'notes': notes
-        })
-        return context
+        message = "Updates Successful"
+
+        return render(request, 'ss_app/notes_form.html',
+                    {'formset': notes_formset,
+                     'client': client,
+                     #'appts': appts,
+                     'message':message})
+
+
+
+    def build_view(self, **kwargs):
+        client = Client.objects.get(pk=self.kwargs.get('pk'))
+        notes_formset = CreateNotesFormSet(queryset=Notes.objects.filter\
+        (appointment__client=client, items_discussed__isnull=True, \
+         appointment__date__lte=datetime.datetime.now(), \
+         appointment__time__available="B") \
+         .order_by('-appointment__date'))
+
+        old_notes = Notes.objects.filter(appointment__client=client).exclude(items_discussed__isnull=True)
+
+        return (client, notes_formset, old_notes)
+
+        #return render(request, 'ss_app/client_form.html', {
+        #'notes': notes,
+        #'message': message,
+
+        #})
+
+
+
 
 class ClientDeleteView(LoginRequiredMixin, DeleteView):
     login_url='/ss_app/login'

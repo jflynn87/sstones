@@ -10,6 +10,10 @@
 
 {% block body_block%}
 {%load bootstrap%}
+{%if message%}
+  {{message}}
+{%endif%}
+
 {%if not form.instance.pk%}
     <h2>Create New Client</h2>
   {%else%}
@@ -30,8 +34,8 @@
       <th>Payment Made?</th>
     </thead>
     <tbody>
-  {{formset.management_form}}
-  {%for form in notes%}
+  {{notes_formset.management_form}}
+  {%for form in notes_formset%}
     <tr>
       <td>{{form.appointment}}</td>
       <td>{{form.items_discussed}}</td>
@@ -44,10 +48,32 @@
 </table>
     <button type="submit" class="btn btn-primary">Update Client</button>
   {%endif%}
-
-
-
 </form>
+
+<h3>Historical Notes</h3>
+<table class="table">
+  <thead>
+    <th>Meeting Date</th>
+    <th>Items Discussed</th>
+    <th>Follow Ups</th>
+    <th>Payment Made?</th>
+  </thead>
+  <tbody>
+{%for note in old_notes%}
+  <tr>
+    <td>{{note.appointment}}</td>
+    <td>{{note.items_discussed}}</td>
+    <td>{{note.follow_ups}}</td>
+    <td>{{note.paid}}</td>
+
+  </tr>
+  {%endfor%}
+</tbody>
+</table>
+  <br>
+
+
+
 <br>
 <br>
 {%endblock%}

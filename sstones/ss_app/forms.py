@@ -206,6 +206,9 @@ class CreateNotesForm(ModelForm):
             super().__init__(*args, **kwargs)
             self.fields['appointment'].disabled = True
             self.fields['appointment'].required = False
+            #self.fields['items_discussed'].required = False
+            #self.fields['follow_ups'].required = False
+            #self.fields['paid'].required = False
             #if self.instance.appointment != None:
             #    print ('form', self.instance.appointment.date)
             #    if self.instance.appointment.date > datetime.datetime.now().date():
