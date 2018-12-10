@@ -25,6 +25,8 @@ from django.http import JsonResponse
 from django.core import serializers
 import json
 
+from django.template.loader import render_to_string
+
 # If modifying these scopes, delete the file token.json.
 SCOPES = 'https://www.googleapis.com/auth/calendar'
 
@@ -76,11 +78,9 @@ class CalView(LoginRequiredMixin, TemplateView):
         if not self.request.user.is_staff:
             print ('unauthorized')
             return super(CalView, self).dispatch(request, *args, **kwargs)
-            #return HttpResponse('Unauthorized', status=401)
         else:
             return super(CalView, self).dispatch(request, *args, **kwargs)
 
-    #calendar works wiht no override of context, just addng to show requested slots
     def get_context_data(self, **kwargs):
         context = super(CalView, self).get_context_data(**kwargs)
 
@@ -133,12 +133,10 @@ class CalView(LoginRequiredMixin, TemplateView):
         formset = CalUpdateFormSet(queryset=Days.objects.filter(day__gte=datetime.datetime.now().date()))
         appointment_list = self.get_appt_list()
 
-
         return render (request, 'ss_app/days_list.html', {'requests': requests,
                                                           'appointments': appointment_list,
                                                           'formset': formset,
                                                           'message': message,
-
                                                             })
 
 
@@ -153,16 +151,11 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
         day = Days.objects.get(pk=kwargs.get('pk'))
         formset  = SlotsFormSet(queryset=TimeSlots.objects.filter(day=day).order_by('start_time'))
         appt_list = []
-        #for slot in TimeSlots.objects.filter(day=day).order_by('start_time'):
-        #    appt = Appointment.objects.filter(time__pk=slot.pk).values('client__name', 'client__pk')
-        #    appt_list.append(appt.get('client__name'))
-        #display_list = zip(formset, appt_list)
+
         context.update({
         'day': day,
         'formset': formset,
-        #'appt_list': appt_list,
-        #'display_list': display_list,
-                })
+        })
         print (context)
         return (context)
 
@@ -187,29 +180,23 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
                       slot.assigned_to = cd.get('assigned_to')
                       slot.comments = cd.get('comments')
                       self.add_to_cal(slot)
+                      self.send_client_email(slot)
                    else:
                       slot.available = cd.get('available')
                       slot.assigned_to = cd.get('assigned_to')
                       slot.comments = cd.get('comments')
 
                    slot.save()
-
-
-
                    message = 'Updates Successful'
         else:
-            print (formset.errors)
-            message = formset.errors
+            print ('formset errors',formset.errors)
+            message = None
 
         day = Days.objects.get(pk=kwargs.get('pk'))
-        formset  = SlotsFormSet(queryset=TimeSlots.objects.filter(day=day).order_by('start_time'))
-
-
 
         return render (request, 'ss_app/days_detail.html', {'day': day,
                                                             'formset': formset,
                                                             'message': message,
-
                                                             })
 
     def add_to_cal(self, slot):
@@ -229,7 +216,6 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
         mtg_start = str(slot.day) + "T" + str(slot.start_time)
         mtg_end = str(slot.day) + "T" + str(slot.end_time)
 
-
         try:
             appt = Appointment.objects.get(time=slot)
 
@@ -242,25 +228,28 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
                      'end': {'dateTime':mtg_end,
                                'timeZone': 'Asia/Tokyo',
                             },
-
             }
+
+            event = service.events().insert(calendarId='steppingstonetk@gmail.com', body=event).execute()
 
         except Exception as e:
             print ('exception', e)
-            # event = {'summary': 'meeting',
-            #          'description': desc,
-            #          'start': {'dateTime':mtg_start,
-            #                    'timeZone': 'Asia/Tokyo',
-            #                   },
-            #          'end': {'dateTime':mtg_end,
-            #                    'timeZone': 'Asia/Tokyo',
-            #                 },
-            #
-            # }
 
-        print ('event', event)
-        event = service.events().insert(calendarId='steppingstonetk@gmail.com', body=event).execute()
+        return
 
+    def send_client_email(self, slot):
+
+        appt = Appointment.objects.get(time__pk=slot.pk)
+
+        msg_plain = render_to_string('C:/Users/John/PythonProjects/sstones/sstones/ss_app/templates/ss_app/email.txt', {'appt': appt})
+        msg_html = render_to_string('C:/Users/John/PythonProjects/sstones/sstones/ss_app/templates/ss_app/email.html', {'appt': appt})
+        print(msg_html)
+        send_mail("Your Appointment is confirmed",
+        msg_plain,
+        "steppingstonetk.gmail.com",
+        [appt.client.email],
+        html_message=msg_html,
+        )
 
         return
 
@@ -292,7 +281,7 @@ def get_client(request):
        slots = TimeSlots.objects.filter(day__pk=request.GET.get('activity')).order_by('start_time')
        appt_list = []
        for slot in slots:
-           appt = Appointment.objects.filter(time__pk=slot.pk).values('client__name', 'client__pk')
+           appt = Appointment.objects.filter(time__pk=slot.pk).values('client__name', 'client__pk', 'pk')
            appt_list.append(list(appt))
 
        data = json.dumps(appt_list)
@@ -472,23 +461,13 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
 
         data = self.build_view()
 
-                #'client': data[0],
-                #'notes_formset': data[1],
-                #'old_notes': data[2],
-                #})
-
-
-        #client = Client.objects.get(pk=self.kwargs.get('pk'))
-        #notes = CreateNotesFormSet(queryset=Notes.objects.filter(appointment__client=client).order_by('-appointment__date'))
-        #message = "Updates Successful"
-
         return render(request, 'ss_app/notes_form.html',
                     {'notes_formset': data[1],
                      'old_notes': data[2],
                      'client': data[0],
                      #'appts': appts,
-                     'message':message})
-
+            #         'message':message
+            })
 
 
     def build_view(self, **kwargs):
@@ -502,14 +481,6 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
         old_notes = Notes.objects.filter(appointment__client=client).exclude(items_discussed__isnull=True)
 
         return (client, notes_formset, old_notes)
-
-        #return render(request, 'ss_app/client_form.html', {
-        #'notes': notes,
-        #'message': message,
-
-        #})
-
-
 
 
 class ClientDeleteView(LoginRequiredMixin, DeleteView):
@@ -565,10 +536,3 @@ class NotesCreateView(LoginRequiredMixin, CreateView):
              'client': client,
              'appts': appts,
              'message':message})
-
-        #return super().post(request, **kwargs)
-
-
-
-        #
-        #     return HttpResponseRedirect(self.success_url)

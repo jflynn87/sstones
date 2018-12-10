@@ -14,11 +14,22 @@ $(document).ready(function() {
          for (i = 0; i < json.length; ++i) {
            console.log(i);
            if (json[i][0] != undefined)  {
-            console.log(json[i][0].client__name);
 
-          $('#client' + [i+1]).html(json[i][0].client__name);
+              var client_link = $("<a />", {
+                id : "client" + [i+1],
+                href : '/ss_app/update_client/' + json[i][0].client__pk,
+                text : json[i][0].client__name
+              })
 
-        //  $('#client a' + [i+1]).attr("href", 'ss_app:client_form' + 'pk=' + json[i][0].client__pk)
+              var appt_link = $("<a />", {
+                id : "appt" + [i+1],
+                href : '/ss_app/thanks/' + json[i][0].pk,
+                text : "Appointment Detail/Info"
+              })
+              console.log(client_link);
+              $('#client' + [i+1]).html(client_link)
+              $('#appt' + [i+1]).html(appt_link);
+
 
         }
       }

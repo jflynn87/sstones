@@ -40,10 +40,6 @@ class SlotsForm(forms.ModelForm):
             ("R", "Requested")
                 )
 
-      # available = forms.ChoiceField(choices=CHOICES, initial="O")
-      # assigned_to = forms.ChoiceField()
-      # comments = forms.CharField(max_length=100)
-
       class Meta:
           model = TimeSlots
           fields = ['day', 'start_time', 'end_time', 'available', 'assigned_to', 'comments']
@@ -64,6 +60,16 @@ class SlotsForm(forms.ModelForm):
            self.fields['start_time'].widget.attrs['style']= 'border: 0px solid'
            self.fields['end_time'].widget.attrs['size']= '6'
            self.fields['end_time'].widget.attrs['style']= 'border: 0px solid'
+
+      def clean(self, *args, **kwargs):
+          cleaned_data = super(SlotsForm, self).clean()
+          print ('cd', cleaned_data['available'])
+          if cleaned_data['available'] == "B" and cleaned_data['assigned_to'] == None:
+              #raise forms.ValidationError("Please assign the booked meeting(s) to someone")
+              self.errors['assigned_to'] = "Please assign someone to booked meetings"
+              self.fields['assigned_to'].widget.attrs['style'] = 'background-color:red'
+
+          return cleaned_data
 
 
 SlotsFormSet = modelformset_factory(TimeSlots, SlotsForm, extra=0 )

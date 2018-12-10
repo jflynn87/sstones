@@ -2,28 +2,26 @@
 {%load static%}
 {%load staticfiles%}
 {% block body_block%}
-
-
-
-
 <script type="text/javascript" src="{%static 'js/slots.js'%}"></script>
-
-{{form.errors}}
-{% if form.errors %}
-    {% for field in form %}
-        {% for error in field.errors %}
+{%if formset.errors %}
+    {% for dict in formset.errors %}
+        {% for error in dict.values %}
             <div class="alert alert-danger">
                 <strong>{{ error|escape }}</strong>
             </div>
         {% endfor %}
     {% endfor %}
-    {% for error in form.non_field_errors %}
+    {% for error in formset.non_field_errors %}
         <div class="alert alert-danger">
             <strong>{{ error|escape }}</strong>
         </div>
     {% endfor %}
-{% endif %}
-
+{%endif%}
+{%if message%}
+<div class="alert alert-danger">
+    <strong>{{ message|escape }}</strong>
+</div>
+{%endif%}
 
 <h1>Schedule</h1>
 
@@ -38,6 +36,7 @@
     <th>Status</th>
     <th>Assign To</th>
     <th>Our Comments</th>
+    <th>Appointment View</th>
 
   </thead>
   <tbody id=tbody>
@@ -47,8 +46,6 @@
 
       {{formset.management_form}}
     {%for form in formset%}
-
-
     <td style="display:none">{{ form.id }}</td>
     <td>{{form.start_time}}</td>
     <td>{{form.end_time}}</td>
@@ -56,15 +53,13 @@
     <td>{{form.available}}</td>
     <td>{{form.assigned_to}}</td>
     <td>{{form.comments}}</td>
-
-    
-    </tr>
-
-    {%endfor%}
+    <td id=appt{{forloop.counter}}></td>
+</tr>
+{%endfor%}
 </tbody>
 </table>
   <input type="submit" value=" Submit Changes" class="btn btn-primary">
-  </form>
+</form>
 
 
   {%endblock%}

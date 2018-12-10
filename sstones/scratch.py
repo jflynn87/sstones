@@ -6,23 +6,52 @@ django.setup()
 
 from ss_app.models import TimeSlots, Appointment, Days
 from django.db.models import Q, Count
+from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
+from django.template.loader import render_to_string
+from email.mime.image import MIMEImage
 
 def run():
-    date = '2018-11-29'
-    #staff_cnt = 2
-    #slot_list = []
-    appts = Appointment.objects.all()
+    day = Days.objects.get(day='2018-12-9')
+    slot = TimeSlots.objects.get(day=day, start_time = "14:00")
+    print (slot.pk)
+    appt = Appointment.objects.get(time__pk=slot.pk)
 
-    for apt in appts:
-        print (apt.time.pk)
-    time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date))
-    for slot in time_slots:
-        print (slot, slot.start_time, slot.pk)
-        #if slot.available == "O":
-        #    slot_list.append(slot)
-        #elif TimeSlots.objects.filter(day=Days.objects.get(day=date), start_time=slot.start_time, available__in=('B', 'R')).count() < staff_cnt:
-        #    slot_list.append(slot)
+    mail = EmailMessage()
+    mail_sub = "Your appointment is confirmed"
+            #mail_to = "From: "+ client.name
+            #mail_email = "   Email: " + client.email
+    mail_msg = appt.client.name + ", " + "Thank you for contacting us. You are confirmed"
+    fp = open("C:/Users/John/PythonProjects/sstones/sstones/static/images/ss_logo.jpg", 'rb')
+    msg_img = MIMEImage(fp.read())
+    fp.close()
 
-    #print (slot_list)
+    msg_plain = render_to_string('C:/Users/John/PythonProjects/sstones/sstones/templates/email.txt', {'appt': appt})
+    msg_html = render_to_string('C:/Users/John/PythonProjects/sstones/sstones/templates/email.html', {'appt': appt})
+    send_mail("Your Appointment is confirmed",
+    msg_plain,
+    "steppingstonetk.gmail.com",
+    [appt.client.email],
+    html_message=msg_html,
+    )
 
+
+
+
+
+    #these were commented            #msg = EmailMessage(mail_content, 'steppingstonetk.gmail.com',['steppingstonetk@gmail.com'],['jflynn87@hotmail.com'])
+    #these were commented            #mail_recipients = ['steppingstonetk@gmail.com'],['jflynn87@hotmail.com'], ['jrc7825@gmail.com']
+
+
+            #these work
+    #mail_recipients = [appt.client.email]
+    #print (appt.client.email)
+    #email = EmailMultiAlternatives(mail_sub, mail_msg, 'steppingstonetk.gmail.com', mail_recipients)
+    #email.content_type = "html"
+    #email.mixed_subtype = "related"
+
+    #msg_img.add_header('Content-ID', 'msg_img')
+    #email.attach(msg_img)
+
+    #email.send()
+    #send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
 run()

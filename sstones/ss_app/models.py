@@ -66,7 +66,6 @@ class FocusAreas(models.Model):
 
 class Client(models.Model):
     name = models.CharField(max_length=100)
-    #focus_areas = models.CharField(max_length=100, null=True)
     email = models.EmailField()
     phone = models.CharField(max_length=20, null=True)
     coverage = models.ForeignKey(Staff, on_delete=models.CASCADE, null=True)
@@ -86,24 +85,17 @@ class Appointment(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
     comments = models.TextField(max_length=300, null=True)
     date = models.DateField(null=True)
-    time = models.ForeignKey(TimeSlots, on_delete=models.CASCADE, related_name='appt', null=True)
+    time = models.ForeignKey(TimeSlots, on_delete=models.CASCADE, related_name="appt", null=True)
     location = models.TextField(max_length=100, null=True, choices=LOCATIONS)
     message_read = models.BooleanField(default=False)
-
 
     def __str__(self):
         return str(self.date) + ' ' + str(self.time)
 
 
-
 class Notes(models.Model):
-    #CHOICES = (FocusAreas.objects.all())
-    #CHOICES = (('1', 'Leadership'), ('2', 'Teamwork'))
-
-    #client = models.ForeignKey(Client, on_delete=models.CASCADE)
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, null=True)
     note_date = models.DateField(auto_now_add=True)
-    #focus_areas = models.CharField(max_length=10, choices=CHOICES, null=True)
     items_discussed = models.TextField(null=True)
     follow_ups = models.TextField(null=True)
     paid = models.BooleanField(default=False)
