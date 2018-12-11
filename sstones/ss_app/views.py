@@ -15,6 +15,7 @@ from django.views.generic.edit import ProcessFormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q, Count
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 
 
 from googleapiclient.discovery import build
@@ -58,12 +59,8 @@ class ThanksPageView(TemplateView):
         return context
 
 
-
-
-
 class PaymentPageView(TemplateView):
     template_name= "ss_app/payment.html"
-
 
 
 class CalView(LoginRequiredMixin, TemplateView):
@@ -73,28 +70,24 @@ class CalView(LoginRequiredMixin, TemplateView):
     template_name = "ss_app/days_list.html"
     #paginate_by = 90
 
-    def dispatch(self, request, *args, **kwargs):
-
-        if not self.request.user.is_staff:
-            print ('unauthorized')
-            return super(CalView, self).dispatch(request, *args, **kwargs)
-        else:
-            return super(CalView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(CalView, self).get_context_data(**kwargs)
 
         requests = Appointment.objects.filter\
         (Q(time__available="R") | Q(time__available="B", time__assigned_to=None))
-        formset = CalUpdateFormSet(queryset=Days.objects.filter(day__gte=datetime.datetime.now().date()))
+
+        formset = CalUpdateFormSet(queryset=Days.objects.filter\
+        (day__gte=datetime.datetime.now().date()))
+
         appointment_list = self.get_appt_list()
 
         context.update({
         'requests': requests,
         'appointments': appointment_list,
         'formset': formset,
-
         })
+
         return context
 
 
@@ -130,8 +123,10 @@ class CalView(LoginRequiredMixin, TemplateView):
         requests = Appointment.objects.filter\
         (Q(time__available="R") | Q(time__available="B", time__assigned_to=None))
 
-        formset = CalUpdateFormSet(queryset=Days.objects.filter(day__gte=datetime.datetime.now().date()))
-        appointment_list = self.get_appt_list()
+        formset = CalUpdateFormSet(queryset=Days.objects.filter\
+        (day__gte=datetime.datetime.now().date()))
+
+        #appointment_list = self.get_appt_list()
 
         return render (request, 'ss_app/days_list.html', {'requests': requests,
                                                           'appointments': appointment_list,
@@ -240,9 +235,9 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
     def send_client_email(self, slot):
 
         appt = Appointment.objects.get(time__pk=slot.pk)
-
-        msg_plain = render_to_string('C:/Users/John/PythonProjects/sstones/sstones/ss_app/templates/ss_app/email.txt', {'appt': appt})
-        msg_html = render_to_string('C:/Users/John/PythonProjects/sstones/sstones/ss_app/templates/ss_app/email.html', {'appt': appt})
+        dir = settings.BASE_DIR + '/ss_app/templates/ss_app/'
+        msg_plain = render_to_string(dir + 'email.txt', {'appt': appt})
+        msg_html = render_to_string(dir + 'email.html', {'appt': appt})
         print(msg_html)
         send_mail("Your Appointment is confirmed",
         msg_plain,
