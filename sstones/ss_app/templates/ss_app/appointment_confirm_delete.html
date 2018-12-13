@@ -1,0 +1,49 @@
+{%extends "base.html"%}
+{%load staticfiles%}
+{%load static%}
+{%load bootstrap%}
+
+
+{%block tittle_block%}
+  <title>Confirm Delete - Appointment</title>
+{%endblock%}
+
+
+{%block body_block%}
+
+<h1>Delete Appointment</h1>
+<table class="table">
+  <thead>
+    <th>Date</th>
+    <th>Time</th>
+    <th>Client</th>
+    <th>Comments</th>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{appointment.date}}</td>
+      <td>{{appointment.time}}</td>
+      <td>{{appointment.client.name}}</td>
+      <td>{{appointment.comments}}</td>
+
+    </tr>
+  </tbody>
+</table>
+
+
+<br>
+<br>
+<a href="{% url 'ss_app:detail' pk=day.pk %}"> <button class="btn btn-primary">Cancel</button></a>
+<br>
+<br>
+<form method="post">
+  {%csrf_token%}
+    <input type="submit" class="btn btn-danger" value="Delete Activity">
+    <br>
+
+</form>
+<br>
+
+
+
+{%endblock%}

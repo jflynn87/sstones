@@ -23,7 +23,7 @@ $(document).ready(function() {
 
               var appt_link = $("<a />", {
                 id : "appt" + [i+1],
-                href : '/ss_app/thanks/' + json[i][0].pk,
+                href : '/ss_app/update_appt/' + json[i][0].pk,
                 text : "Appointment Detail/Info"
               })
               console.log(client_link);

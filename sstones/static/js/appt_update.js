@@ -68,11 +68,11 @@ $( function() {
 $(document).ready(function() {
     console.log('page ready 1', $("#id_date").innerHTML);
     console.log($('#id_time').val());
-    if ($('#id_date').innerHTML === undefined && $('#id_date').val() === '' || $('#id_time').val() != '') {
+    if ($('#id_date').innerHTML === undefined && $('#id_date').val() === '') {
       console.log("empty date");
     }
     else {
-    console.log($('#id_date').val());
+    console.log('pre-ajax', $('#id_date').val());
     var url = $("#appt_form").attr("data-slots-url");  // get the url of the `load_cities` view
     var dayId = $('#id_date').val();  // get the selected country ID from the HTML input
 
@@ -111,18 +111,3 @@ $( function() {
 
  });
 });
-
-
-
-
-
-// Initialize and add the map
-function initMap() {
-// The location of Uluru
-var office = {lat: 35.627353, lng: 139.726217};
-// The map, centered at Uluru
-var map = new google.maps.Map(
-   document.getElementById('map'), {zoom: 16, center: office});
-// The marker, positioned at Uluru
-var marker = new google.maps.Marker({position: office, map: map});
-}

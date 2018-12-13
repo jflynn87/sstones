@@ -78,16 +78,6 @@
 </form>
 </div>
 
-<div hidden id="schedule">
-  <ul id=holiday_sect>
-
-  {%for day in days%}
-    <li> {{day.day}} </li>
-  {%endfor%}
-</ul>
-
-
-</div>
 <br>
 <hr>
 <div class="access">
@@ -123,5 +113,16 @@
 <br>
 
 
+
+<div hidden id="schedule">
+  <ul id=holiday_sect>
+
+  {%for day in days%}
+    <li> {{day.day}} </li>
+  {%endfor%}
+</ul>
+
+
+</div>
 
 {%endblock%}

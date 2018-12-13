@@ -157,7 +157,7 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
 
     def post(self, request, **kwargs):
         formset = SlotsFormSet(request.POST)
-
+        message = None
         if formset.is_valid():
             for form in formset:
                 cd = form.cleaned_data
@@ -239,7 +239,7 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
         msg_plain = render_to_string(dir + 'email.txt', {'appt': appt})
         msg_html = render_to_string(dir + 'email.html', {'appt': appt})
         print(msg_html)
-        send_mail("Your Appointment is confirmed",
+        send_mail("Your Appointment is Confirmed",
         msg_plain,
         "steppingstonetk.gmail.com",
         [appt.client.email],
@@ -392,7 +392,101 @@ class AppointmentCreateView(CreateView):
                                                                         })
 
 
+class AppointmentUpdateView(LoginRequiredMixin, UpdateView):
+      login_url='/ss_app/login'
+      model = Appointment
+      form_class = AppointmentForm
+      template_name = "ss_app/update_appt_form.html"
+      success_url = reverse_lazy("ss_app:calendar")
+
+      def get_context_data(self, **kwargs):
+
+          context = super(AppointmentUpdateView, self).get_context_data(**kwargs)
+          appt = Appointment.objects.get(pk=self.kwargs.get('pk'))
+          client = CreateClientForm(instance=Client.objects.get(pk=appt.client.pk))
+          context.update( {
+           'appt': appt,
+           'days': Days.objects.filter(closed=True),
+           'client': client
+           })
+
+          return context
+
+
+      def form_valid(self, request, **kwargs):
+           appt_form = AppointmentForm(self.request.POST)
+           if appt_form.is_valid():
+               cd = appt_form.cleaned_data
+
+               appt = Appointment.objects.get(pk=self.kwargs.get('pk'))
+               orig_slot = TimeSlots.objects.get(pk=appt.time.pk)
+               day = Days.objects.get(day=cd['date'])
+               slot = TimeSlots.objects.get(pk=cd['time'].pk)
+
+               appt.date = cd['date']
+               appt.time= slot
+               appt.location=cd['location']
+               appt.comments=cd['comments']
+               appt.save()
+               #auto book new slot
+               slot.available = "B"
+               if appt.client.coverage != None:
+                   slot.assigned_to = appt.client.coverage
+               print ('slot save', slot)
+               slot.save()
+               #reset original time slot to open if changed
+               print ('orig slot', orig_slot.pk)
+               print ('new slot', slot.pk)
+               if orig_slot.pk != slot.pk:
+                   orig_slot.available = "O"
+                   orig_slot.assigned_to = None
+                   orig_slot.save()
+               return HttpResponseRedirect(reverse('ss_app:detail', kwargs={'pk':day.pk}))
+           else:
+               ## does this make sense?  When can form be invalid and what should i do?
+               raise forms.ValidationError("Invalid update")
+               return HttpResponseRedirect(reverse('ss_app:detail', kwargs={'pk':day.pk}))
+
+
+class AppointmentDeleteView(LoginRequiredMixin, DeleteView):
+      login_url='/ss_app/login'
+      model = Appointment
+      #form_class = AppointmentForm
+      #template_name = "ss_app/appointment_confirm_delete.html"
+      success_url = reverse_lazy("ss_app:calendar")
+
+      def get_context_data(self, **kwargs):
+          context = super(AppointmentDeleteView, self).get_context_data(**kwargs)
+          appt = Appointment.objects.get(pk=self.kwargs.get('pk'))
+          day = Days.objects.get(day=appt.date)
+          context.update({
+          'day': day
+          })
+
+          return context
+
+
+      def form_valid(self, request, **kwargs):
+          appt_form = AppointmentForm(self.request.POST)
+          if appt_form.is_valid():
+              cd = appt_form.cleaned_data
+
+              appt = Appointment.objects.get(pk=self.kwargs.get('pk'))
+              orig_slot = TimeSlots.objects.get(pk=appt.time.pk)
+              #reset attached slot
+              orig_slot.available = "O"
+              orig_slot.assigned_to = None
+              orig_slot.save()
+
+              return HttpResponseRedirect(reverse('ss_app:detail', kwargs={'pk':day.pk}))
+          else:
+              ## does this make sense?  When can form be invalid and what should i do?
+              raise forms.ValidationError("Invalid update")
+              return HttpResponseRedirect(reverse('ss_app:detail', kwargs={'pk':day.pk}))
+
+
 def load_slots(request,date_dict=None):
+    print ('loading slots')
     if request.GET:
         date = request.GET.get('day')
     else:

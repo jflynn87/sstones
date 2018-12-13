@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+
+
+{%block tittle_block%}
+  <title>Appointments - Stepping Stones</title>
+{%endblock%}
+
+
+{% block body_block%}
+<script type="text/javascript" src="{%static 'js/appt.js'%}"></script>
+
+{%load bootstrap%}
+ {%if not form.instance.pk%}
+  <h3>Error - no meeting details</h3>
+  {%else%}
+
+<form method="POST" id="appt_form" data-slots-url="{% url 'ajax_load_slots'%}" enctype="multipart/form-data">
+  {%csrf_token%}
+{{form.date|bootstrap}}
+{{form.time|bootstrap}}
+{{form.location|bootstrap}}
+{{form.comments|bootstrap}}
+        <button type="submit" class="btn btn-primary submit">Click to Update</button>
+
+</form>
+<br>
+<a href="{% url 'ss_app:delete_appt' pk=form.instance.pk %}"> <button class="btn btn-danger">Click to Delete</button></a>
+{%endif%}
+
+<div hidden id="schedule">
+  <ul id=holiday_sect>
+
+  {%for day in days%}
+    <li> {{day.day}} </li>
+  {%endfor%}
+</ul>
+
+
+</div>
+
+
+
+{%endblock%}

@@ -1,7 +1,12 @@
 {%load staticfiles%}
 {% block body_block%}
 <h1>Test email</h1>
-<h3>to:  {{appt.client.name}}</h3>
-<p> text mail </p>
+{{appt.client.name}},
+Thank you for contacting Stepping Stones.  We are pleased to confirm your appointment on {{appt.date}} at {{appt.time.start_time}}.  You will be meeting with {{appt.time.assigned_to.name}} at {{appt.get_location_display}}.
+We are looking forward to meeting you.
+
+The Stepping Stones Team
+
+
 
 {%endblock%}

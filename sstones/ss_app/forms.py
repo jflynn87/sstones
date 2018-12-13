@@ -89,20 +89,29 @@ class AppointmentForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(AppointmentForm, self).__init__(*args, **kwargs)
-        self.fields['time'].queryset = TimeSlots.objects.none()
+        if not kwargs.get('instance'):
+            self.fields['time'].queryset = TimeSlots.objects.none()
+        else:
+            appt = Appointment.objects.get(pk=self.instance.pk)
+            day = Days.objects.get(day=appt.date)
+            slots = TimeSlots.objects.filter(day=day)
+
+            self.fields['time'].queryset = TimeSlots.objects.filter(day=day)
+            #self.initial['time'] = TimeSlots.objects.get(pk=self.instance.time.pk)
         self.fields['date'].required = False
         self.fields['time'].required = False
         self.fields['comments'].required = False
         self.fields['location'].required = False
         self.fields['location'].initial = 1
 
+
         if 'date' in self.data:
             try:
                date = self.data.get('date')
                if date != '':
                  self.fields['time'].queryset = TimeSlots.objects.filter(day=Days.objects.get(day=date))
-            except (ValueError, TypeError):
-               pass
+            except Exception:
+               self.errors['date'] = ['Invalid date.  Please enter a valid date']
 
 
     def clean(self, *args, **kwargs):
@@ -122,9 +131,9 @@ class AppointmentForm(ModelForm):
                     print ('time error')
                     self.errors['time'] = ['Please select a time from the list']
         except Exception as e:
-                #pass is ok as it has comments per the edit above
+                self.errors['date'] = ['Invalid date.  Please enter a valid date']
                 print ('date exception', e)
-                pass
+
 
 
         return cleaned_data

@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth.models import User
 from django.db import models
+from datetime import datetime
 
 
 
@@ -41,7 +42,8 @@ class TimeSlots(models.Model):
     comments = models.CharField(max_length=100, null=True)
 
     def __str__(self):
-        return str(self.start_time)
+        return str(self.start_time)[0:5] + " - " + str(self.end_time)[0:5]
+
 
     def get_queryset(self,day):
         return self.objects.filter(day=day)
