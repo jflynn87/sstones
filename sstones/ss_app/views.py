@@ -521,7 +521,7 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
     login_url='/ss_app/login'
     model = Client
     form_class = CreateClientForm
-    success_url = reverse_lazy("ss_app:client_list")
+    #success_url = reverse_lazy("ss_app:client_list")
 
     def get_context_data(self, **kwargs):
         context = super(ClientUpdateView, self).get_context_data(**kwargs)
@@ -549,14 +549,17 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
             print ('invalid formset', notes_formset)
 
         data = self.build_view()
+        print (data)
 
-        return render(request, 'ss_app/notes_form.html',
-                    {'notes_formset': data[1],
-                     'old_notes': data[2],
-                     'client': data[0],
+#return render(request, 'ss_app/slots_dropdown_list_options.html', {'slots':slot_list})
+        return HttpResponseRedirect(reverse_lazy('ss_app:update_client', args=[instance.pk]))
+        #return render(request, ('ss_app/client_form.html',
+        #            {'notes_formset': data[1],
+        #             'old_notes': data[2],
+                     #'client': data[0],
                      #'appts': appts,
             #         'message':message
-            })
+        #    }))
 
 
     def build_view(self, **kwargs):

@@ -23,9 +23,6 @@
 <form method="post">
   {%csrf_token%}
 {{form|bootstrap}}
-{%if not form.instance.pk%}
-    <button type="submit" class="btn btn-primary">Create Client</button>
-  {%else%}
   <table class="table">
     <thead>
       <th>Meeting Date</th>
@@ -46,8 +43,11 @@
     {%endfor%}
     <br>
 </table>
+{%if not form.instance.pk%}
+    <button type="submit" class="btn btn-primary">Create Client</button>
+  {%else%}
     <button type="submit" class="btn btn-primary">Update Client</button>
-  {%endif%}
+{%endif%}
 </form>
 
 <h3>Historical Notes</h3>
