@@ -546,6 +546,8 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
                     print ('invalid note form', form)
             client_form.save()
         else:
+
+            return
             print ('invalid formset', notes_formset)
 
         data = self.build_view()
