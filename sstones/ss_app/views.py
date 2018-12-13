@@ -233,8 +233,9 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
         return
 
     def send_client_email(self, slot):
-
+        print ('slot pk =', slot.pk)
         appt = Appointment.objects.get(time__pk=slot.pk)
+        print ('assigned to = ', appt.time.assigned_to.name)
         dir = settings.BASE_DIR + '/ss_app/templates/ss_app/'
         msg_plain = render_to_string(dir + 'email.txt', {'appt': appt})
         msg_html = render_to_string(dir + 'email.html', {'appt': appt})

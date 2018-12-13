@@ -12,7 +12,7 @@ class TimeSlotsAdmin(admin.ModelAdmin):
 admin.site.register(Event)
 admin.site.register(Appointment)
 admin.site.register(Days)
-admin.site.register(TimeSlots)
+admin.site.register(TimeSlots, TimeSlotsAdmin)
 admin.site.register(Staff)
 admin.site.register(Client)
 admin.site.register(Notes)
