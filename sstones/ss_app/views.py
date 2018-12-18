@@ -175,13 +175,15 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
                       slot.assigned_to = cd.get('assigned_to')
                       slot.comments = cd.get('comments')
                       slot.save()
-                      self.add_to_cal(slot)
+                      add_to_cal(slot)
                       self.send_client_email(slot)
                    else:
                       slot.available = cd.get('available')
                       slot.assigned_to = cd.get('assigned_to')
                       slot.comments = cd.get('comments')
                       slot.save()
+                      add_to_cal(slot)
+
 
                    message = 'Updates Successful'
         else:
@@ -195,19 +197,38 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
                                                             'message': message,
                                                             })
 
-    def add_to_cal(self, slot):
 
-        print (slot.assigned_to)
-        store = file.Storage('token.json')
-        creds = store.get()
-        if not creds or creds.invalid:
-            flow = client.flow_from_clientsecrets('credentials.json', SCOPES)
-            creds = tools.run_flow(flow, store)
-        service = build('calendar', 'v3', http=creds.authorize(Http()))
+    def send_client_email(self, slot):
+        print ('slot pk =', slot.pk)
+        appt = Appointment.objects.get(time__pk=slot.pk)
+        print ('assigned to = ', appt.time)
+        dir = settings.BASE_DIR + '/ss_app/templates/ss_app/'
+        msg_plain = render_to_string(dir + 'email.txt', {'appt': appt})
+        msg_html = render_to_string(dir + 'email.html', {'appt': appt})
+        print(msg_html)
+        send_mail("Your Appointment is Confirmed",
+        msg_plain,
+        "steppingstonetk.gmail.com",
+        [appt.client.email],
+        html_message=msg_html,
+         )
 
-        # Insert test events
-        page_token = None
+        return
 
+def add_to_cal(slot):
+
+
+    store = file.Storage('token.json')
+    creds = store.get()
+    if not creds or creds.invalid:
+        flow = client.flow_from_clientsecrets('credentials.json', SCOPES)
+        creds = tools.run_flow(flow, store)
+    service = build('calendar', 'v3', http=creds.authorize(Http()))
+
+    # Insert test events
+    page_token = None
+
+    if slot.available == "B":
         desc = slot.comments
         mtg_start = str(slot.day) + "T" + str(slot.start_time)
         mtg_end = str(slot.day) + "T" + str(slot.end_time)
@@ -227,28 +248,18 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
             }
 
             event = service.events().insert(calendarId='steppingstonetk@gmail.com', body=event).execute()
+            slot.cal_event_id = event.get('id')
+            slot.save()
 
         except Exception as e:
             print ('exception', e)
+    else:
 
-        return
+        service.events().delete(calendarId='primary', eventId=slot.cal_event_id).execute()
 
-    def send_client_email(self, slot):
-        print ('slot pk =', slot.pk)
-        appt = Appointment.objects.get(time__pk=slot.pk)
-        print ('assigned to = ', appt.time)
-        dir = settings.BASE_DIR + '/ss_app/templates/ss_app/'
-        msg_plain = render_to_string(dir + 'email.txt', {'appt': appt})
-        msg_html = render_to_string(dir + 'email.html', {'appt': appt})
-        print(msg_html)
-        send_mail("Your Appointment is Confirmed",
-        msg_plain,
-        "steppingstonetk.gmail.com",
-        [appt.client.email],
-        html_message=msg_html,
-         )
 
-        return
+    return
+
 
 def appt_get_client(request):
     print (request.GET)
@@ -342,6 +353,7 @@ class AppointmentCreateView(CreateView):
                     appt.save()
 
                     slot.available = "R"
+                    slot.assigned_to = client.coverage
                     slot.save()
                 elif slot.available in ['B', 'R']:
                     new_slot = TimeSlots()
@@ -349,6 +361,7 @@ class AppointmentCreateView(CreateView):
                     new_slot.start_time = form.instance.time.start_time
                     new_slot.end_time = form.instance.time.end_time
                     new_slot.available = "R"
+                    new_slot.assigned_to = client.coverage
                     new_slot.save()
 
                     appt = appt_form.save(commit=False)
@@ -506,6 +519,7 @@ def load_slots(request):
     slot_list = []
     try:
         if client.coverage:
+            print ('in client coverage')
             time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date))
             for slot in time_slots:
                 if slot.assigned_to == client.coverage and slot.available != "O":
@@ -514,17 +528,22 @@ def load_slots(request):
                     slot_list.append(slot)
                 else:
                     pass
-    except Exception:
-        staff_cnt = len(Staff.objects.all())
+        else:
+            staff_cnt = len(Staff.objects.all())
 
-        time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date))
-        for slot in time_slots:
-            if slot.available == "O":
-                slot_list.append(slot)
-            elif TimeSlots.objects.filter(day=Days.objects.get(day=date), start_time=slot.start_time, available__in=('B', 'R')).count() < staff_cnt:
-                slot_list.append(slot)
-            else:
-                slots = ''
+            time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date))
+            for slot in time_slots:
+                if slot.available == "O":
+                    slot_list.append(slot)
+                elif TimeSlots.objects.filter(day=Days.objects.get(day=date), start_time=slot.start_time, available__in=('B', 'R')).count() < staff_cnt:
+                    slot_list.append(slot)
+                else:
+                    slots = ''
+
+    except Exception:
+        print ('in exception')
+        slots = ''
+
     return render(request, 'ss_app/slots_dropdown_list_options.html', {'slots':slot_list})
 
 class SignUp(CreateView):
