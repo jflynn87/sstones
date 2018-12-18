@@ -136,10 +136,10 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 user = os.environ.get('sstones_email_id')
 pwd = os.environ.get('sstones_email_password')
-user_no_quotes = user.strip("'")
-pwd_no_quotes= pwd.strip("'")
-EMAIL_HOST_USER = user_no_quotes
-EMAIL_HOST_PASSWORD = pwd_no_quotes
+#user_no_quotes = user.strip("'")
+#pwd_no_quotes= pwd.strip("'")
+EMAIL_HOST_USER = user
+EMAIL_HOST_PASSWORD = pwd
 EMAIL_PORT = 587
 
 

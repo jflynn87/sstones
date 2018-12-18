@@ -509,15 +509,10 @@ class AppointmentDeleteView(LoginRequiredMixin, DeleteView):
 def load_slots(request):
     print ('loadings slots')
     date = request.GET.get('day')
+    slot_list = []
     try:
         client = Client.objects.get(email=request.GET.get('client'))
         print (client.coverage)
-    except Exception as e:
-        client = Client.objects.none()
-
-    #print ('loading slots', client, date)
-    slot_list = []
-    try:
         if client.coverage:
             print ('in client coverage')
             time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date))
@@ -528,7 +523,8 @@ def load_slots(request):
                     slot_list.append(slot)
                 else:
                     pass
-        else:
+
+    except Exception as e:
             staff_cnt = len(Staff.objects.all())
 
             time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date))
@@ -540,9 +536,10 @@ def load_slots(request):
                 else:
                     slots = ''
 
-    except Exception:
-        print ('in exception')
-        slots = ''
+    # except Exception as e:
+    #     print (client)
+    #     print ('in exception', e)
+    #     slots = ''
 
     return render(request, 'ss_app/slots_dropdown_list_options.html', {'slots':slot_list})
 
