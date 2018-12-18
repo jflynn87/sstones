@@ -176,7 +176,7 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
                       slot.comments = cd.get('comments')
                       slot.save()
                       add_to_cal(slot)
-                      self.send_client_email(slot)
+                      send_client_email(slot)
                    else:
                       slot.available = cd.get('available')
                       slot.assigned_to = cd.get('assigned_to')
@@ -198,22 +198,22 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
                                                             })
 
 
-    def send_client_email(self, slot):
-        print ('slot pk =', slot.pk)
-        appt = Appointment.objects.get(time__pk=slot.pk)
-        print ('assigned to = ', appt.time)
-        dir = settings.BASE_DIR + '/ss_app/templates/ss_app/'
-        msg_plain = render_to_string(dir + 'email.txt', {'appt': appt})
-        msg_html = render_to_string(dir + 'email.html', {'appt': appt})
-        print(msg_html)
-        send_mail("Your Appointment is Confirmed",
-        msg_plain,
-        "steppingstonetk.gmail.com",
-        [appt.client.email],
-        html_message=msg_html,
-         )
+def send_client_email(self, slot):
+    print ('slot pk =', slot.pk)
+    appt = Appointment.objects.get(time__pk=slot.pk)
+    print ('assigned to = ', appt.time)
+    dir = settings.BASE_DIR + '/ss_app/templates/ss_app/'
+    msg_plain = render_to_string(dir + 'email.txt', {'appt': appt})
+    msg_html = render_to_string(dir + 'email.html', {'appt': appt})
+    print(msg_html)
+    send_mail("Your Appointment is Confirmed",
+    msg_plain,
+    "steppingstonetk.gmail.com",
+    [appt.client.email],
+    html_message=msg_html,
+     )
 
-        return
+    return
 
 def add_to_cal(slot):
 
@@ -284,7 +284,6 @@ def appt_get_client(request):
 
 
 def get_client(request):
-    #pass
     if request.is_ajax():
        slots = TimeSlots.objects.filter(day__pk=request.GET.get('activity')).order_by('start_time')
        appt_list = []
@@ -455,13 +454,15 @@ class AppointmentUpdateView(LoginRequiredMixin, UpdateView):
                    slot.assigned_to = appt.client.coverage
                print ('slot save', slot)
                slot.save()
+               send_client_email(slot)
+               add_to_cal(slot)
+
                #reset original time slot to open if changed
-               print ('orig slot', orig_slot.pk)
-               print ('new slot', slot.pk)
                if orig_slot.pk != slot.pk:
                    orig_slot.available = "O"
                    orig_slot.assigned_to = None
                    orig_slot.save()
+                   add_to_cal(orig_slot)
                return HttpResponseRedirect(reverse('ss_app:detail', kwargs={'pk':day.pk}))
            else:
                ## does this make sense?  When can form be invalid and what should i do?
@@ -490,6 +491,7 @@ class AppointmentDeleteView(LoginRequiredMixin, DeleteView):
       def form_valid(self, request, **kwargs):
           appt_form = AppointmentForm(self.request.POST)
           if appt_form.is_valid():
+              print ('reset slot on delete')
               cd = appt_form.cleaned_data
 
               appt = Appointment.objects.get(pk=self.kwargs.get('pk'))
@@ -498,6 +500,7 @@ class AppointmentDeleteView(LoginRequiredMixin, DeleteView):
               orig_slot.available = "O"
               orig_slot.assigned_to = None
               orig_slot.save()
+              add_to_cal(orig_slot)
 
               return HttpResponseRedirect(reverse('ss_app:detail', kwargs={'pk':day.pk}))
           else:
@@ -513,18 +516,20 @@ def load_slots(request):
     try:
         client = Client.objects.get(email=request.GET.get('client'))
         print (client.coverage)
+        # for existing client with coverage assigned
         if client.coverage:
             print ('in client coverage')
             time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date))
             for slot in time_slots:
                 if slot.assigned_to == client.coverage and slot.available != "O":
+                    print ('passing')
                     pass
                 elif slot.available == "O" and slot.assigned_to != client.coverage:
                     slot_list.append(slot)
                 else:
                     pass
-
-    except Exception as e:
+        else:
+            #for existing client with no coverage assigned
             staff_cnt = len(Staff.objects.all())
 
             time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date))
@@ -536,10 +541,19 @@ def load_slots(request):
                 else:
                     slots = ''
 
-    # except Exception as e:
-    #     print (client)
-    #     print ('in exception', e)
-    #     slots = ''
+    except Exception as e:
+            # for new client
+            print ('in exception', e)
+            staff_cnt = len(Staff.objects.all())
+
+            time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date))
+            for slot in time_slots:
+                if slot.available == "O":
+                    slot_list.append(slot)
+                elif TimeSlots.objects.filter(day=Days.objects.get(day=date), start_time=slot.start_time, available__in=('B', 'R')).count() < staff_cnt:
+                    slot_list.append(slot)
+                else:
+                    slots = ''
 
     return render(request, 'ss_app/slots_dropdown_list_options.html', {'slots':slot_list})
 
