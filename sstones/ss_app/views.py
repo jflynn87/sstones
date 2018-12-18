@@ -500,20 +500,21 @@ def load_slots(request):
         client = Client.objects.get(email=request.GET.get('client'))
         print (client.coverage)
     except Exception as e:
-        print ('exception ', e)
+        client = Client.objects.none()
 
     #print ('loading slots', client, date)
     slot_list = []
-    if client.coverage:
-        time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date))
-        for slot in time_slots:
-            if slot.assigned_to == client.coverage and slot.available != "O":
-                pass
-            elif slot.available == "O" and slot.assigned_to != client.coverage:
-                slot_list.append(slot)
-            else:
-                pass
-    else:
+    try:
+        if client.coverage:
+            time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date))
+            for slot in time_slots:
+                if slot.assigned_to == client.coverage and slot.available != "O":
+                    pass
+                elif slot.available == "O" and slot.assigned_to != client.coverage:
+                    slot_list.append(slot)
+                else:
+                    pass
+    except Exception:
         staff_cnt = len(Staff.objects.all())
 
         time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date))
