@@ -241,12 +241,12 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
         msg_plain = render_to_string(dir + 'email.txt', {'appt': appt})
         msg_html = render_to_string(dir + 'email.html', {'appt': appt})
         print(msg_html)
-        # send_mail("Your Appointment is Confirmed",
-        # msg_plain,
-        # "steppingstonetk.gmail.com",
-        # [appt.client.email],
-        # html_message=msg_html,
-        # )
+        send_mail("Your Appointment is Confirmed",
+        msg_plain,
+        "steppingstonetk.gmail.com",
+        [appt.client.email],
+        html_message=msg_html,
+         )
 
         return
 
@@ -385,7 +385,7 @@ class AppointmentCreateView(CreateView):
 
             #these work
             mail_recipients = ['steppingstonetk@gmail.com'],['jflynn87@hotmail.com'], ['jrc7825@gmail.com']
-            #send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
+            send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
 
             print (appt.pk)
 
