@@ -9,6 +9,7 @@ from django.forms.models import modelformset_factory
 from django.forms.formsets import BaseFormSet
 from django.forms import inlineformset_factory
 import ss_app.views
+from django.core.exceptions import ObjectDoesNotExist
 
 
 from django.utils.safestring import mark_safe
@@ -122,18 +123,37 @@ class AppointmentForm(ModelForm):
             print ('raising form error')
             raise forms.ValidationError("Please enter either a message or a meeting date/time")
 
-        try:
-            if cleaned_data.get('date') < datetime.datetime.now().date():
-                print ('raising date error')
-                self.errors['date'] = ['Invalid date.  Please choose a future date']
-            else:
-                if cleaned_data.get('time') == None:
-                    print ('time error')
-                    self.errors['time'] = ['Please select a time from the list']
-        except Exception as e:
-                self.errors['date'] = ['Invalid date.  Please enter a valid date']
-                print ('date exception', e)
+        if cleaned_data.get('date') != None:
+            try:
+                day = Days.objects.get(day=cleaned_data.get('date'))
+                print (day)
+                if day.closed:
+                    self.errors['date'] = ["We are closed that day, please choose another day or email us by clicking the link below."]
+                if day.day < datetime.datetime.now().date():
+                    self.errors['date'] = ['Invalid date.  Please choose a future date']
+                else:
+                    if cleaned_data.get('time') == None:
+                        self.errors['time'] = ['Please select a time from the list']
 
+            except ObjectDoesNotExist:
+                self.errors['date'] = ["Please contact us via email to schedule for that date."]
+            except Exception as e:
+                print (e)
+                self.errors['date'] = ["Please choose another date, or email us for help."]
+
+
+            # try:
+            #     if cleaned_data.get('date') < datetime.datetime.now().date():
+            #         print ('raising date error')
+            #         self.errors['date'] = ['Invalid date.  Please choose a future date']
+            #     else:
+            #         if cleaned_data.get('time') == None:
+            #             print ('time error')
+            #             self.errors['time'] = ['Please select a time from the list']
+            # except Exception as e:
+            #         self.errors['date'] = ['Invalid date.  Please enter a valid date']
+            #         print ('date exception', e)
+            #
 
 
         return cleaned_data

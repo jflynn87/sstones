@@ -38,32 +38,41 @@ function checkDate(date) {
 
   }
 
-/*  get slots based on selected date   https://simpleisbetterthancomplex.com/tutorial/2018/01/29/how-to-implement-dependent-or-chained-dropdown-list-with-django.html*/
+function getSlots() {
+       var url = $("#appt_form").attr("data-slots-url");  // get the url of the `load_cities` view
+       var dayId = $('#id_date').val();  // get the selected country ID from the HTML input
+       var client = $('#id_email').val()
+
+       console.log(dayId);
+       console.log('client', client);
+
+       $.ajax({                       // initialize an AJAX request
+         url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+         data: {
+           'day': dayId,
+           'client': client       // add the country id to the GET parameters
+         },
+
+           success: function (data) {   // `data` is the return of the `load_cities` view function
+           $("#id_time").html(data);  // replace the contents of the city input with the data that came from the server
+
+        },
+           failure: function(json) {
+           console.log('fail');
+           console.log(json);
+        }
+
+          });
+
+  };
+
 
 $( function() {
-  $("#id_date").change(function () {
-    var url = $("#appt_form").attr("data-slots-url");  // get the url of the `load_cities` view
-    var dayId = $(this).val();  // get the selected country ID from the HTML input
-
-    $.ajax({                       // initialize an AJAX request
-      url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
-      data: {
-        'day': dayId       // add the country id to the GET parameters
-      },
-
-        success: function (data) {   // `data` is the return of the `load_cities` view function
-        $("#id_time").html(data);  // replace the contents of the city input with the data that came from the server
-
-     },
-        failure: function(json) {
-        console.log('fail');
-        console.log(json);
-     }
-
-       });
-
+   $("#id_date").change(function () {
+     getSlots()
+   });
  });
-});
+
 
 $(document).ready(function() {
     console.log('page ready 1', $("#id_date").innerHTML);
@@ -73,17 +82,17 @@ $(document).ready(function() {
     }
     else {
     console.log($('#id_date').val());
-    var url = $("#appt_form").attr("data-slots-url");  // get the url of the `load_cities` view
-    var dayId = $('#id_date').val();  // get the selected country ID from the HTML input
+    var url = $("#appt_form").attr("data-slots-url");
+    var dayId = $('#id_date').val();
 
-    $.ajax({                       // initialize an AJAX request
-      url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+    $.ajax({
+      url: url,
       data: {
-        'day': dayId       // add the country id to the GET parameters
+        'day': dayId
       },
 
-        success: function (data) {   // `data` is the return of the `load_cities` view function
-        $("#id_time").html(data);  // replace the contents of the city input with the data that came from the server
+        success: function (data) {
+        $("#id_time").html(data);
 
      }
        });
@@ -95,7 +104,11 @@ $( function() {
   $("#id_email").change(function () {
     console.log("email changed");
     var client = $("#id_email").val();  // get the url of the `load_cities` view
-    console.log(client);
+
+    if ($('#id_date').val() != '') {
+      getSlots()
+    }
+
     $.ajax({                       // initialize an AJAX request
       url: "/ss_app/ajax/appt_get_client/",                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
       data: {
@@ -106,9 +119,12 @@ $( function() {
         $("#id_name").val(data[0]);  // replace the contents of the city input with the data that came from the server
         $("#id_phone").val(data[1]);
 
-     }
+     },
+        failure: function(json) {
+     console.log('fail');
+     console.log(json);
+      }
        });
-
  });
 });
 
