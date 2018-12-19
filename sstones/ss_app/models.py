@@ -38,7 +38,7 @@ class TimeSlots(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     available = models.CharField(max_length=1,choices=AVAILABLE_CHOICES)
-    assigned_to = models.ForeignKey(Staff, on_delete=models.CASCADE, null=True)
+    assigned_to = models.ForeignKey(Staff, on_delete=models.CASCADE)
     comments = models.CharField(max_length=100, null=True)
     cal_event_id = models.CharField(max_length=256, null=True)
     created = models.DateTimeField(auto_now_add=True, null=True)

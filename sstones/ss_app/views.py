@@ -335,7 +335,8 @@ class AppointmentCreateView(CreateView):
                 client.save()
 
 
-            if Appointment.objects.filter(client=client, date=appt_form.cleaned_data['date']).exists():
+            if appt_form.cleaned_data['date'] != None and \
+               Appointment.objects.filter(client=client, date=appt_form.cleaned_data['date']).exists():
                 appt_form.add_error('date', 'You already have an appointment for that date, please send an email via the link below if you have any questions.')
                 return super(AppointmentCreateView, self).form_invalid(appt_form)
 
@@ -348,32 +349,33 @@ class AppointmentCreateView(CreateView):
                     appt.save()
 
                     slot.available = "R"
-                    slot.assigned_to = client.coverage
+                    #slot.assigned_to = client.coverage
                     slot.save()
-                elif slot.available in ['B', 'R']:
-                    print ('form slot', form.instance.time.pk)
-                    new_slot = TimeSlots()
-                    new_slot.day = form.instance.time.day
-                    new_slot.start_time = form.instance.time.start_time
-                    new_slot.end_time = form.instance.time.end_time
-                    new_slot.available = "R"
-                    new_slot.assigned_to = client.coverage
-                    new_slot.save()
-                    print ('new slot', new_slot.pk)
+                    notes = Notes()
+                    notes.appointment = appt
+                    notes.save()
 
-                    appt = appt_form.save(commit=False)
-                    appt.client=client
-                    appt.time = new_slot
-                    appt.save()
+            #     elif slot.available in ['B', 'R']:
+            #         print ('form slot', form.instance.time.pk)
+            #         new_slot = TimeSlots()
+            #         new_slot.day = form.instance.time.day
+            #         new_slot.start_time = form.instance.time.start_time
+            #         new_slot.end_time = form.instance.time.end_time
+            #         new_slot.available = "R"
+            #         #new_slot.assigned_to = client.coverage
+            #         new_slot.save()
+            #         print ('new slot', new_slot.pk)
+            #
+            #         appt = appt_form.save(commit=False)
+            #         appt.client=client
+            #         appt.time = new_slot
+            #         appt.save()
             else:
-                    appt = appt_form.save(commit=False)
-                    appt.client=client
-                    appt.save()
+                appt = appt_form.save(commit=False)
+                appt.client=client
+                appt.save()
 
 
-            notes = Notes()
-            notes.appointment = appt
-            notes.save()
 
 
             mail_sub = "SS web form submitted"
