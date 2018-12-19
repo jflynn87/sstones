@@ -38,7 +38,7 @@
         {%endfor%}
         {%for request in requests%}
         <tr>
-            <td><a href="calendar/{{request.time.day.id}}">{{request.date}}</td>
+            <td><a href="update_appt/{{request.id}}">{{request.date}}</td>
             <td>{{request.time.start_time}}</td>
             <td>{{request.time.end_time}}</td>
             <td>{{request.time.get_available_display}}</td>

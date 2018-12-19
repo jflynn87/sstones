@@ -41,6 +41,7 @@ class TimeSlots(models.Model):
     assigned_to = models.ForeignKey(Staff, null=True, on_delete=models.CASCADE)
     comments = models.CharField(max_length=100, null=True)
     cal_event_id = models.CharField(max_length=256, null=True)
+    created = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return str(self.start_time)[0:5] + " - " + str(self.end_time)[0:5]

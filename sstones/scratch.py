@@ -11,30 +11,15 @@ from django.template.loader import render_to_string
 from email.mime.image import MIMEImage
 
 def run():
-    day = Days.objects.get(day='2018-12-9')
-    slot = TimeSlots.objects.get(day=day, start_time = "14:00")
-    print (slot.pk)
-    appt = Appointment.objects.get(time__pk=slot.pk)
-
-    mail = EmailMessage()
-    mail_sub = "Your appointment is confirmed"
-            #mail_to = "From: "+ client.name
-            #mail_email = "   Email: " + client.email
-    mail_msg = appt.client.name + ", " + "Thank you for contacting us. You are confirmed"
-    fp = open("C:/Users/John/PythonProjects/sstones/sstones/static/images/ss_logo.jpg", 'rb')
-    msg_img = MIMEImage(fp.read())
-    fp.close()
-
-    msg_plain = render_to_string('C:/Users/John/PythonProjects/sstones/sstones/templates/email.txt', {'appt': appt})
-    msg_html = render_to_string('C:/Users/John/PythonProjects/sstones/sstones/templates/email.html', {'appt': appt})
-    send_mail("Your Appointment is confirmed",
-    msg_plain,
-    "steppingstonetk.gmail.com",
-    [appt.client.email],
-    html_message=msg_html,
-    )
-
-
+            time_slots = TimeSlots.objects.filter(day=Days.objects.get(day='2018-12-22')).order_by('start_time')
+            print (time_slots)
+            for slot in time_slots:
+                if Appointment.objects.filter(time__pk=slot.pk).exists():
+                    print ('found', slot)
+                #if slot.available == "O":
+                #    slot_list.append(slot)
+                #else:
+                #    slots = ''
 
 
 

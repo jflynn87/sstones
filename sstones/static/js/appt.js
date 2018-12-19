@@ -73,6 +73,16 @@ $( function() {
    });
  });
 
+$(function() {
+  $("#id_time").focus(function () {
+    console.log("select");
+  if ($('#id_date').val() != '') {
+   getSlots()
+ }
+})
+})
+
+
 
 $(document).ready(function() {
     console.log('page ready 1', $("#id_date").innerHTML);

@@ -16,13 +16,16 @@
   <h3>Error - no meeting details</h3>
   {%else%}
 
+<h2>Client:  {{client.name}}</h2>
+<br>
+
 <form method="POST" id="appt_form" data-slots-url="{% url 'ajax_load_slots'%}" enctype="multipart/form-data">
   {%csrf_token%}
 {{form.date|bootstrap}}
 {{form.time|bootstrap}}
 {{form.location|bootstrap}}
 {{form.comments|bootstrap}}
-        <button type="submit" class="btn btn-primary submit">Click to Update</button>
+        <button type="submit" class="btn btn-primary submit">Click to Book</button>
 
 </form>
 <br>

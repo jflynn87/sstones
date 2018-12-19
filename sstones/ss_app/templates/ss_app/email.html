@@ -2,7 +2,12 @@
 {%load static%}
 {% block body_block%}
 <h3>{{appt.client.name}}, </h3>
-<p>Thank you for contacting Stepping Stones.  We are pleased to confirm your appointment on {{appt.date}} at {{appt.time.start_time}}.  You will be meeting with {{appt.time.assigned_to}} at
+<p>Thank you for contacting Stepping Stones.  We are pleased to confirm your appointment on {{appt.date}} at {{appt.time.start_time}}
+  {%if appt.time.assigned_to%}
+  You will be meeting with {{appt.time.assigned_to}} at
+  {%else%}
+  Your meeting will be held at
+  {%endif%}
   {%if appt.location == "1"%}
     {{appt.get_location_display}} (address below).
   {%elif appt.location == 2%}

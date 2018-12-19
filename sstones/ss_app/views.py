@@ -52,7 +52,6 @@ class ThanksPageView(TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ThanksPageView, self).get_context_data(*args, **kwargs)
-        print (kwargs)
         context.update ({
         'appt': Appointment.objects.get(pk=kwargs.get('pk'))
         })
@@ -96,7 +95,6 @@ class CalView(LoginRequiredMixin, TemplateView):
 
         for appt in Appointment.objects.filter(date__lte=datetime.datetime.now().date(), \
            time__available="B"):
-            print ('appt', appt.client)
             if Notes.objects.filter(appointment=appt,\
             items_discussed__isnull=False).exists():
                 pass
@@ -111,12 +109,11 @@ class CalView(LoginRequiredMixin, TemplateView):
         if formset.is_valid():
             for form in formset:
                 cd = form.cleaned_data
-                print (cd)
                 key = cd.get('id')
                 day = Days.objects.filter(pk=key.pk).update(closed=cd.get('closed'), note=cd.get('note'))
                 message = 'Updates Successful'
         else:
-            print (formset.errors)
+            print ("CalView error", formset.errors)
             message = formset.errors
 
         appointment_list = self.get_appt_list()
@@ -125,8 +122,6 @@ class CalView(LoginRequiredMixin, TemplateView):
 
         formset = CalUpdateFormSet(queryset=Days.objects.filter\
         (day__gte=datetime.datetime.now().date()))
-
-        #appointment_list = self.get_appt_list()
 
         return render (request, 'ss_app/days_list.html', {'requests': requests,
                                                           'appointments': appointment_list,
@@ -161,7 +156,6 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
         if formset.is_valid():
             for form in formset:
                 cd = form.cleaned_data
-                print (cd)
                 key = cd.get('id')
                 slot = TimeSlots.objects.get(pk=key.pk)
                 if slot.available == cd.get('available') and \
@@ -171,26 +165,31 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
                 else:
                    if slot.available != cd.get('available') and \
                       cd.get('available') == "B":
-                      slot.available = cd.get('available')
-                      slot.assigned_to = cd.get('assigned_to')
-                      slot.comments = cd.get('comments')
-                      slot.save()
+                      #slot.available = cd.get('available')
+                      #slot.assigned_to = cd.get('assigned_to')
+                      #slot.comments = cd.get('comments')
+                      slot.update(available=cd.get('available'), comments=cd.get('comments'))
                       add_to_cal(slot)
                       send_client_email(slot)
                    else:
                       slot.available = cd.get('available')
-                      slot.assigned_to = cd.get('assigned_to')
+                      #slot.assigned_to = cd.get('assigned_to')
+                      slot_assigned_to = slot.assigned_to
                       slot.comments = cd.get('comments')
+                      #slot.update(available=cd.get('available'), comments=cd.get('comments'))
                       slot.save()
                       add_to_cal(slot)
 
+                 #  if TimeSlots.objects.filter(day=cd['day'], start_time=cd['start_time'], available="O").count() > 1:
+                #       TimeSlots.objects.filter(day=cd['day'], start_time=cd['start_time'], available="O").latest('created').delete()
 
                    message = 'Updates Successful'
         else:
-            print ('formset errors',formset.errors)
+            print ('slotsdetail formset errors',formset.errors)
             message = None
 
         day = Days.objects.get(pk=kwargs.get('pk'))
+        formset  = SlotsFormSet(queryset=TimeSlots.objects.filter(day=day).order_by('start_time'))
 
         return render (request, 'ss_app/days_detail.html', {'day': day,
                                                             'formset': formset,
@@ -198,7 +197,7 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
                                                             })
 
 
-def send_client_email(self, slot):
+def send_client_email(slot):
     print ('slot pk =', slot.pk)
     appt = Appointment.objects.get(time__pk=slot.pk)
     print ('assigned to = ', appt.time)
@@ -253,8 +252,7 @@ def add_to_cal(slot):
 
         except Exception as e:
             print ('exception', e)
-    else:
-
+    elif slot.cal_event_id:
         service.events().delete(calendarId='primary', eventId=slot.cal_event_id).execute()
 
 
@@ -272,7 +270,6 @@ def appt_get_client(request):
         except ObjectDoesNotExist:
             client_list = []
 
-        print (client_list)
         data = json.dumps(client_list)
         return HttpResponse(data, content_type="application/json")
 
@@ -292,7 +289,6 @@ def get_client(request):
            appt_list.append(list(appt))
 
        data = json.dumps(appt_list)
-       print (data)
        return HttpResponse(data, content_type="application/json")
     else:
        print ('not ajax')
@@ -324,6 +320,7 @@ class AppointmentCreateView(CreateView):
 
 
     def form_valid(self, form):
+        print ('in form valid')
         client_form = CreateClientForm(self.request.POST)
         appt_form = AppointmentForm(self.request.POST)
         if client_form.is_valid() and appt_form.is_valid():
@@ -339,7 +336,6 @@ class AppointmentCreateView(CreateView):
 
 
             if Appointment.objects.filter(client=client, date=appt_form.cleaned_data['date']).exists():
-                print ('appt exists')
                 appt_form.add_error('date', 'You already have an appointment for that date, please send an email via the link below if you have any questions.')
                 return super(AppointmentCreateView, self).form_invalid(appt_form)
 
@@ -355,6 +351,7 @@ class AppointmentCreateView(CreateView):
                     slot.assigned_to = client.coverage
                     slot.save()
                 elif slot.available in ['B', 'R']:
+                    print ('form slot', form.instance.time.pk)
                     new_slot = TimeSlots()
                     new_slot.day = form.instance.time.day
                     new_slot.start_time = form.instance.time.start_time
@@ -362,6 +359,7 @@ class AppointmentCreateView(CreateView):
                     new_slot.available = "R"
                     new_slot.assigned_to = client.coverage
                     new_slot.save()
+                    print ('new slot', new_slot.pk)
 
                     appt = appt_form.save(commit=False)
                     appt.client=client
@@ -397,7 +395,8 @@ class AppointmentCreateView(CreateView):
 
             #these work
             mail_recipients = ['steppingstonetk@gmail.com'],['jflynn87@hotmail.com'], ['jrc7825@gmail.com']
-            send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
+            if settings.DEBUG == False:
+                send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
 
             print (appt.pk)
 
@@ -423,7 +422,7 @@ class AppointmentUpdateView(LoginRequiredMixin, UpdateView):
 
           context = super(AppointmentUpdateView, self).get_context_data(**kwargs)
           appt = Appointment.objects.get(pk=self.kwargs.get('pk'))
-          client = CreateClientForm(instance=Client.objects.get(pk=appt.client.pk))
+          client = Client.objects.get(pk=appt.client.pk)
           context.update( {
            'appt': appt,
            'days': Days.objects.filter(closed=True),
@@ -450,8 +449,6 @@ class AppointmentUpdateView(LoginRequiredMixin, UpdateView):
                appt.save()
                #auto book new slot
                slot.available = "B"
-               if appt.client.coverage != None:
-                   slot.assigned_to = appt.client.coverage
                print ('slot save', slot)
                slot.save()
                send_client_email(slot)
@@ -460,12 +457,14 @@ class AppointmentUpdateView(LoginRequiredMixin, UpdateView):
                #reset original time slot to open if changed
                if orig_slot.pk != slot.pk:
                    orig_slot.available = "O"
-                   orig_slot.assigned_to = None
+                   #orig_slot.assigned_to = None
                    orig_slot.save()
                    add_to_cal(orig_slot)
+
                return HttpResponseRedirect(reverse('ss_app:detail', kwargs={'pk':day.pk}))
            else:
                ## does this make sense?  When can form be invalid and what should i do?
+               print (appt_form)
                raise forms.ValidationError("Invalid update")
                return HttpResponseRedirect(reverse('ss_app:detail', kwargs={'pk':day.pk}))
 
@@ -488,25 +487,22 @@ class AppointmentDeleteView(LoginRequiredMixin, DeleteView):
           return context
 
 
-      def form_valid(self, request, **kwargs):
-          appt_form = AppointmentForm(self.request.POST)
-          if appt_form.is_valid():
-              print ('reset slot on delete')
-              cd = appt_form.cleaned_data
+      def post(self, request, **kwargs):
 
-              appt = Appointment.objects.get(pk=self.kwargs.get('pk'))
-              orig_slot = TimeSlots.objects.get(pk=appt.time.pk)
-              #reset attached slot
-              orig_slot.available = "O"
-              orig_slot.assigned_to = None
-              orig_slot.save()
-              add_to_cal(orig_slot)
+          appt = Appointment.objects.get(pk=self.kwargs.get('pk'))
+          orig_slot = TimeSlots.objects.get(pk=appt.time.pk)
+          #reset attached slot
+          orig_slot.available = "O"
+          #orig_slot.assigned_to = None
+          orig_slot.save()
+          add_to_cal(orig_slot)
 
-              return HttpResponseRedirect(reverse('ss_app:detail', kwargs={'pk':day.pk}))
-          else:
-              ## does this make sense?  When can form be invalid and what should i do?
-              raise forms.ValidationError("Invalid update")
-              return HttpResponseRedirect(reverse('ss_app:detail', kwargs={'pk':day.pk}))
+          #if TimeSlots.objects.filter(day=orig_slot.day, start_time=orig_slot.start_time).count() > 1:
+        #      TimeSlots.objects.filter(day=orig_slot.day, start_time=orig_slot.start_time, available="O").latest('created').delete()
+
+
+          return super(AppointmentDeleteView, self).post(self, request, **kwargs)
+          #return HttpResponseRedirect(reverse('ss_app:detail', kwargs={'pk':day.pk}))
 
 
 def load_slots(request):
@@ -519,38 +515,29 @@ def load_slots(request):
         # for existing client with coverage assigned
         if client.coverage:
             print ('in client coverage')
-            time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date))
-            for slot in time_slots:
-                if slot.assigned_to == client.coverage and slot.available != "O":
-                    print ('passing')
-                    pass
-                elif slot.available == "O" and slot.assigned_to != client.coverage:
-                    slot_list.append(slot)
-                else:
-                    pass
-        else:
-            #for existing client with no coverage assigned
-            staff_cnt = len(Staff.objects.all())
-
-            time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date))
+            time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date), assigned_to=client.coverage).order_by('start_time')
             for slot in time_slots:
                 if slot.available == "O":
                     slot_list.append(slot)
-                elif TimeSlots.objects.filter(day=Days.objects.get(day=date), start_time=slot.start_time, available__in=('B', 'R')).count() < staff_cnt:
+        else:
+            # for existing client with no coverage assigned
+            time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date)).order_by('start_time')
+            for slot in time_slots:
+                if slot.available == "O":
                     slot_list.append(slot)
                 else:
                     slots = ''
 
     except Exception as e:
-            # for new client
+            # for new client or from meeting update page
             print ('in exception', e)
             staff_cnt = len(Staff.objects.all())
 
-            time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date))
+            time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date)).order_by('start_time')
             for slot in time_slots:
-                if slot.available == "O":
+                if Appointment.objects.filter(time__pk=slot.pk).exists():
                     slot_list.append(slot)
-                elif TimeSlots.objects.filter(day=Days.objects.get(day=date), start_time=slot.start_time, available__in=('B', 'R')).count() < staff_cnt:
+                elif slot.available == "O":
                     slot_list.append(slot)
                 else:
                     slots = ''

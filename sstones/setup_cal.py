@@ -54,22 +54,19 @@ def setup_cal():
         #staff = Staff.objects.get(name="Unassigned")
 
         for time in times:
-            slots = TimeSlots()
-            slots.day = days
-            slots.start_time = time
-            end_time = datetime.datetime.strptime(time, '%H:%M')
-            end_time += datetime.timedelta(minutes=50)
-            slots.end_time = end_time
+            for person in Staff.objects.all():
+                slots = TimeSlots()
+                slots.day = days
+                slots.start_time = time
+                end_time = datetime.datetime.strptime(time, '%H:%M')
+                end_time += datetime.timedelta(minutes=50)
+                slots.end_time = end_time
 
-            slots.available = "O"
-            #slots.assigned_to = staff
+                slots.available = "O"
+                slots.assigned_to = person
 
-            #slots.objects.get_or_create(day=days,start_time=time,end_time='a',open=True)
-            slots.save()
-
-        #for hours in days:
-        #    print(hours)
-
+                #slots.objects.get_or_create(day=days,start_time=time,end_time='a',open=True)
+                slots.save()
 
 
 
