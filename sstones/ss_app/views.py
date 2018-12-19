@@ -507,7 +507,9 @@ class AppointmentDeleteView(LoginRequiredMixin, DeleteView):
 
 def load_slots(request):
     print ('loadings slots')
+    print (request)
     date = request.GET.get('day')
+    mode = request.GET.get('mode')
     slot_list = []
     try:
         client = Client.objects.get(email=request.GET.get('client'))
@@ -535,7 +537,7 @@ def load_slots(request):
 
             time_slots = TimeSlots.objects.filter(day=Days.objects.get(day=date)).order_by('start_time')
             for slot in time_slots:
-                if Appointment.objects.filter(time__pk=slot.pk).exists():
+                if Appointment.objects.filter(time__pk=slot.pk).exists() and mode == "update":
                     slot_list.append(slot)
                 elif slot.available == "O":
                     slot_list.append(slot)

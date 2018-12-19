@@ -42,15 +42,23 @@ function getSlots() {
        var url = $("#appt_form").attr("data-slots-url");  // get the url of the `load_cities` view
        var dayId = $('#id_date').val();  // get the selected country ID from the HTML input
        var client = $('#id_email').val()
-
+       if ($("#add_appt").length) {
+         var mode = "add"
+       }
+       else if ($('#update_appt').length) {
+         var mode = "update"
+       }
        console.log(dayId);
        console.log('client', client);
+       console.log(mode);
+
 
        $.ajax({                       // initialize an AJAX request
          url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
          data: {
            'day': dayId,
-           'client': client       // add the country id to the GET parameters
+           'client': client,
+           'mode': mode       // add the country id to the GET parameters
          },
 
            success: function (data) {   // `data` is the return of the `load_cities` view function
@@ -83,32 +91,32 @@ $(function() {
 })
 
 
-
-$(document).ready(function() {
-    console.log('page ready 1', $("#id_date").innerHTML);
-    console.log($('#id_time').val());
-    if ($('#id_date').innerHTML === undefined && $('#id_date').val() === '' || $('#id_time').val() != '') {
-      console.log("empty date");
-    }
-    else {
-    console.log($('#id_date').val());
-    var url = $("#appt_form").attr("data-slots-url");
-    var dayId = $('#id_date').val();
-
-    $.ajax({
-      url: url,
-      data: {
-        'day': dayId
-      },
-
-        success: function (data) {
-        $("#id_time").html(data);
-
-     }
-       });
-
-     };
-});
+//
+// $(document).ready(function() {
+//     console.log('page ready 1', $("#id_date").innerHTML);
+//     console.log($('#id_time').val());
+//     if ($('#id_date').innerHTML === undefined && $('#id_date').val() === '' || $('#id_time').val() != '') {
+//       console.log("empty date");
+//     }
+//     else {
+//     console.log($('#id_date').val());
+//     var url = $("#appt_form").attr("data-slots-url");
+//     var dayId = $('#id_date').val();
+//
+//     $.ajax({
+//       url: url,
+//       data: {
+//         'day': dayId
+//       },
+//
+//         success: function (data) {
+//         $("#id_time").html(data);
+//
+//      }
+//        });
+//
+//      };
+// });
 
 $( function() {
   $("#id_email").change(function () {

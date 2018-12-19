@@ -4,25 +4,26 @@
 
 
 {%block tittle_block%}
-  <title>Appointments - Stepping Stones</title>
+  <title id="update_appt">Appointments - Stepping Stones</title>
 {%endblock%}
 
 
 {% block body_block%}
-<script type="text/javascript" src="{%static 'js/appt.js'%}"></script>
 
+<script type="text/javascript" src="{%static 'js/appt.js'%}"></script>
 {%load bootstrap%}
  {%if not form.instance.pk%}
   <h3>Error - no meeting details</h3>
   {%else%}
 
 <h2>Client: <a href="{% url 'ss_app:update_client' pk=client.pk %}">  {{client.name}}</h2></a>
+
 <br>
 
 <form method="POST" id="appt_form" data-slots-url="{% url 'ajax_load_slots'%}" enctype="multipart/form-data">
   {%csrf_token%}
 <p>{{form.date|bootstrap}}</p>
-<p>{{form.time|bootstrap}}  Originally Assigned to:  {{appt.time.assigned_to}}</p>
+<p>{{form.time|bootstrap}}  Original Booking:  {{appt.time.start_time}} with {{appt.time.assigned_to}}</p>
 <p>{{form.location|bootstrap}}</p>
 {{form.comments|bootstrap}}
         <button type="submit" class="btn btn-primary submit">Click to Book</button>
