@@ -25,17 +25,6 @@
         <th>Client</th>
       </thead>
       <tbody>
-        {%for appointment in appointments%}
-        <tr>
-        <td><a href="add_notes/{{appointment.client.id}}">{{appointment.date}}</td>
-        <td>{{appointment.time.start_time}}</td>
-        <td>{{appointment.time.end_time}}</td>
-        <td>Notes Required</td>
-        <td>{{appointment.client.coverage}}</td>
-        <td>{{appointment.client.name}}</td>
-
-        </tr>
-        {%endfor%}
         {%for request in requests%}
         <tr>
             <td><a href="update_appt/{{request.id}}">{{request.date}}</td>
@@ -44,6 +33,26 @@
             <td>{{request.time.get_available_display}}</td>
             <td>{{request.time.assigned_to}}</td>
             <td>{{request.client.name}}</td>
+        </tr>
+        {%endfor%}
+        {%for appointment in appointments%}
+        <tr>
+        <td><a href="add_notes/{{appointment.client.id}}">{{appointment.date}}</td>
+        <td>{{appointment.time.start_time}}</td>
+        <td>{{appointment.time.end_time}}</td>
+        <td>Notes Required</td>
+        <td>{{appointment.client.coverage}}</td>
+        <td>{{appointment.client.name}}</td>
+        </tr>
+        {%endfor%}
+        {%for client in coverage_list%}
+        <tr>
+            <td><a href="update_client/{{client.id}}">{{client.email}}</td>
+            <td></td>
+            <td></td>
+            <td>Coverage Missing</td>
+            <td></td>
+            <td>{{client.name}}</td>
         </tr>
         {%endfor%}
       </tbody>

@@ -85,10 +85,18 @@ class CalView(LoginRequiredMixin, TemplateView):
 
         appointment_list = self.get_appt_list()
 
+        coverage_list = []
+        for client in Client.objects.all():
+            if client.coverage == None:
+                coverage_list.append(client)
+
+        print ('coverage', coverage_list)
+
         context.update({
         'requests': requests,
         'appointments': appointment_list,
         'formset': formset,
+        'coverage_list': coverage_list,
         })
 
         return context
@@ -106,6 +114,7 @@ class CalView(LoginRequiredMixin, TemplateView):
                 appointment_list.append(appt)
 
         return appointment_list
+
 
     def post(self, request, **kwargs):
         formset = CalUpdateFormSet(request.POST)
@@ -443,8 +452,8 @@ class AppointmentCreateView(CreateView):
 
             #these work
             mail_recipients = ['steppingstonetk@gmail.com'],['jflynn87@hotmail.com'], ['jrc7825@gmail.com']
-            #if settings.DEBUG == False:
-            send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
+            if settings.DEBUG == False:
+                send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
 
             print (appt.pk)
 

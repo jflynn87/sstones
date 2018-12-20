@@ -11,15 +11,20 @@ import datetime
 
 
 def setup_cal():
-    '''takes no input, sets up 90 days out from today'''
+    '''adds a new day and time slots to the calendar.'''
 
     start_time = '9:00'
     end_time = '20:00'
     slot_time = 60
 
     # Start date from today to next 5 day
-    start_date = datetime.datetime.now().date()
+    start = Days.objects.latest('day')
+    start_date = start.day
+    print ('start', start_date)
     end_date = datetime.datetime.now().date() + datetime.timedelta(days=180)
+    print ('end', end_date)
+    #start_date = datetime.datetime.now().date()
+    #end_date = datetime.datetime.now().date() + datetime.timedelta(days=180)
 
     days = {}
     date = start_date

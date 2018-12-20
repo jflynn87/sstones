@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 class Days(models.Model):
-    day = models.DateField()
+    day = models.DateField(unique=True)
     closed = models.BooleanField()
     note = models.CharField(max_length=100, null=True)
 
@@ -44,7 +44,7 @@ class TimeSlots(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
-        return str(self.start_time)[0:5] + " - " + str(self.end_time)[0:5]
+        return str(self.start_time)[0:5] + " with " + str(self.assigned_to)
 
 
     def get_queryset(self,day):
@@ -83,7 +83,7 @@ class Appointment(models.Model):
     LOCATIONS=(
                    ("1", "Stepping Stones Office"),
                    ("2", "Another Location (please include location in comments)"),
-                   
+
              )
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)

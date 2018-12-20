@@ -5,28 +5,13 @@ import django
 django.setup()
 
 from ss_app.models import TimeSlots, Appointment, Days
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Max
 from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
 from django.template.loader import render_to_string
 from email.mime.image import MIMEImage
 
+
 def run():
-
-        #day = "2018-12-20"
-        #if TimeSlots.objects.filter(day__day=day, available__in=['B', 'R']).exists():
-            slot  = TimeSlots.objects.filter(available__in=['B', 'R']).annotate(count=Count('available')).values('day__day', 'count')
-
-        #date = slot['day__day']
-            print ('slot', slot)
-            print (slot[0].get('count'))
-            print (slot[0].get('day__day'))
-            # for slot in time_slots:
-            #     if Appointment.objects.filter(time__pk=slot.pk).exists():
-            #         print ('found', slot)
-            #     #if slot.available == "O":
-                #    slot_list.append(slot)
-                #else:
-                #    slots = ''
 
 
 
