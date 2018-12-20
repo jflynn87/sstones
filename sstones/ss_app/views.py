@@ -79,6 +79,10 @@ class CalView(LoginRequiredMixin, TemplateView):
         formset = CalUpdateFormSet(queryset=Days.objects.filter\
         (day__gte=datetime.datetime.now().date()))
 
+        #formset = CalUpdateFormSet(queryset=Days.objects.filter\
+        #(day='2018-12-20'))
+
+
         appointment_list = self.get_appt_list()
 
         context.update({
@@ -128,6 +132,48 @@ class CalView(LoginRequiredMixin, TemplateView):
                                                           'formset': formset,
                                                           'message': message,
                                                             })
+
+
+def cal_get_mtg_cnt(request):
+    if request.is_ajax():
+        day = request.GET.get('day')
+
+        count_list = []
+        if TimeSlots.objects.filter(day__day=day, available__in=['B', 'R']).exists():
+            slot  = TimeSlots.objects.filter(day__day=day, available__in=['B', 'R']).values('day__day', 'day_id').annotate(count=Count('available'))
+
+        #date = slot['day__day']
+            print ('slot', slot)
+            print ('count', slot[0].get('count'))
+            print ('date', slot[0].get('day__day'))
+            print ('date', slot[0].get('day_id'))
+        #print (date.strftime('%Y-%M-%D'))
+
+        #count_list.append(date)
+            count_list.append(str(slot[0].get('day__day')))
+            count_list.append(str(slot[0].get('day_id')))
+            count_list.append(slot[0].get('count'))
+        else:
+            count_list.append(day)
+            day = Days.objects.get(day=day)
+            count_list.append(day.pk)
+            count_list.append(0)
+        data = json.dumps(count_list)
+        return HttpResponse(data, content_type="application/json")
+
+    else:
+        print ('not ajax')
+        raise Http404
+    print ('bad call', request)
+    return
+
+
+
+
+
+
+
+
 
 
 class SlotsDetail(LoginRequiredMixin, TemplateView):
@@ -205,7 +251,7 @@ def send_client_email(slot):
     msg_plain = render_to_string(dir + 'email.txt', {'appt': appt})
     msg_html = render_to_string(dir + 'email.html', {'appt': appt})
     print(msg_html)
-    send_mail("Your Appointment is Confirmed",
+    send_mail("Your Appointment on " + str(appt.date) +" is Confirmed",
     msg_plain,
     "steppingstonetk.gmail.com",
     [appt.client.email],
@@ -376,9 +422,9 @@ class AppointmentCreateView(CreateView):
                 appt.save()
 
 
+            #subject = "SS web form submitted" + form.instance.pk
 
-
-            mail_sub = "SS web form submitted"
+            mail_sub = "SS web form submitted: " + str(form.instance.date) + str(client.name)
             mail_from = "From: "+ client.name
             mail_email = "   Email: " + client.email
             mail_msg = "   Message:  " + form.instance.comments
@@ -397,8 +443,8 @@ class AppointmentCreateView(CreateView):
 
             #these work
             mail_recipients = ['steppingstonetk@gmail.com'],['jflynn87@hotmail.com'], ['jrc7825@gmail.com']
-            if settings.DEBUG == False:
-                send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
+            #if settings.DEBUG == False:
+            send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
 
             print (appt.pk)
 

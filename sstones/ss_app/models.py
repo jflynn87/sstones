@@ -81,9 +81,9 @@ class Client(models.Model):
 
 class Appointment(models.Model):
     LOCATIONS=(
-                   ("1", "Our Office"),
-                   ("2", "Your Office (please include location in comments)"),
-                   ("3", "Other (please include location in comments)")
+                   ("1", "Stepping Stones Office"),
+                   ("2", "Another Location (please include location in comments)"),
+                   
              )
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)

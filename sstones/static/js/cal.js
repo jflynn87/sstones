@@ -1,12 +1,3 @@
-// $(function() {
-//   $( ".datepicker" ).daterangepicker({
-//     changeMonth: true,
-//     changeYear: true,
-//     yearRange: "2018:2021",
-//     // You can put more options here.
-//   });
-// });
-
 $(document).ready(function() {
   var cal_table = document.getElementById("cal_table")
   var days_list = {}
@@ -31,3 +22,48 @@ $(document).ready(function() {
 
       }
 });
+
+$(document).ready(function () {
+
+  var cal_table = document.getElementById("cal_table")
+  var days_list = []
+
+  for (var i = 0; i< cal_table.rows.length -1; i++) {
+
+    day = $("#id_form-" + i + "-day").val()
+    var index = i + 1
+    console.log(index, day);
+    get_count(index, day)
+  }
+})
+
+function get_count(index, day) {
+
+    $.ajax({                       // initialize an AJAX request
+      url: "/ss_app/ajax/cal_get_mtg_cnt/",                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+      data: {
+        'day': day
+      },
+
+        success: function (data) {   // `data` is the return of the `load_cities` view function
+          var mtg_cnt = $("<a />", {
+            id: "slots" + index,
+            href: "/ss_app/calendar/" + data[1],
+            text: "Meeting Count: " + data[2]
+
+          })
+
+          $('#slots' + index).html(mtg_cnt)
+          console.log(mtg_cnt);
+          console.log($('#slots' + index));
+                  //$("#id_time").html(data);  // replace the contents of the city input with the data that came from the server
+
+     },
+        failure: function(json) {
+        console.log('fail');
+        console.log(json);
+     }
+
+     });
+
+}

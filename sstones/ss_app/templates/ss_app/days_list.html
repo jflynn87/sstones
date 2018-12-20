@@ -68,6 +68,7 @@
     <thead>
         <th>Day</th>
         <th>Date</th>
+        <th>Meetings/Schedule</th>
         <th>Check to close</th>
         <th>Notes (optional)</th>
     </thead>
@@ -77,7 +78,8 @@
       <tr>
         <td style="display:none">{{ form.id }}</td>
         <td id="display_day{{forloop.counter}}"> </td>
-        <td>{{form.day}} <a href="calendar/{{form.instance.pk}}">Slots</td>
+        <td>{{form.day}}</td>
+        <td id='slots{{forloop.counter}}'> <a href="calendar/{{form.instance.pk}}">Meetings</td>
         <td>{{form.closed}}</td>
         <td>{{form.note}}</td>
       </tr>

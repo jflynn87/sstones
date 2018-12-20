@@ -11,12 +11,15 @@ from django.template.loader import render_to_string
 from email.mime.image import MIMEImage
 
 def run():
-            #time_slots = TimeSlots.objects.filter(day=Days.objects.get(day='2018-12-22')).order_by('start_time')
-            slots =  (TimeSlots.objects.filter(assigned_to=None))
-            for slot in slots:
-                print (slot.day, slot.start_time, slot.created)
 
-            print (Appointment.objects.all())
+        #day = "2018-12-20"
+        #if TimeSlots.objects.filter(day__day=day, available__in=['B', 'R']).exists():
+            slot  = TimeSlots.objects.filter(available__in=['B', 'R']).annotate(count=Count('available')).values('day__day', 'count')
+
+        #date = slot['day__day']
+            print ('slot', slot)
+            print (slot[0].get('count'))
+            print (slot[0].get('day__day'))
             # for slot in time_slots:
             #     if Appointment.objects.filter(time__pk=slot.pk).exists():
             #         print ('found', slot)
