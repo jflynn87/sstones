@@ -69,10 +69,16 @@
 <div class="col">
 
 
+
+<h5>Jump to Date: <input type="text" name="date" id="date-filter">  <button onclick="reset_dates()" class="btn btn-info">Show all days</h5>
+
+<br>
+<br>
   <form method="POST">
      {%csrf_token%}
 
-  <h4>Select dates to block on the booking calendar  <button type="submit" class="btn btn-primary" "btn-block">Click to Save Updates</button>  </h4>
+  <h4> <button type="submit" class="btn btn-primary" "btn-block">Click to Save Updates</button>  </h4>
+<br>
   <table id="cal_table" class="table">
     <thead>
         <th>Day</th>

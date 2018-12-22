@@ -62,28 +62,15 @@ class SlotsForm(forms.ModelForm):
            self.fields['start_time'].widget.attrs['style']= 'border: 0px solid'
            self.fields['end_time'].widget.attrs['size']= '6'
            self.fields['end_time'].widget.attrs['style']= 'border: 0px solid'
-           #self.fields['assigned_to'].widget.attrs['style']= 'border: 0px solid'
-
-#      def clean(self, *args, **kwargs):
-#          cleaned_data = super(SlotsForm, self).clean()
-#          print ('cd', cleaned_data['available'])
-#          if cleaned_data['available'] == "B" and cleaned_data['assigned_to'] == None:
-#              #raise forms.ValidationError("Please assign the booked meeting(s) to someone")
-#              self.errors['assigned_to'] = "Please assign someone to booked meetings"
-#              self.fields['assigned_to'].widget.attrs['style'] = 'background-color:red'
-
-#          return cleaned_data
 
 
 SlotsFormSet = modelformset_factory(TimeSlots, SlotsForm, extra=0 )
-
 
 
 class AppointmentForm(ModelForm):
 
     class Meta:
          model=Appointment
-         #fields=['name','email','phone','comments', 'date', 'time', 'location']
          fields=['comments', 'date', 'time', 'location']
          widgets = {'date': forms.TextInput({}),
                     'time': forms.Select(attrs= {}),
@@ -106,6 +93,9 @@ class AppointmentForm(ModelForm):
         self.fields['comments'].required = False
         self.fields['location'].required = False
         self.fields['location'].initial = 1
+
+
+        
 
 
         if 'date' in self.data:

@@ -32,7 +32,7 @@ $(document).ready(function () {
 
     day = $("#id_form-" + i + "-day").val()
     var index = i + 1
-    console.log(index, day);
+    //console.log(index, day);
     get_count(index, day)
   }
 })
@@ -54,9 +54,6 @@ function get_count(index, day) {
           })
 
           $('#slots' + index).html(mtg_cnt)
-          console.log(mtg_cnt);
-          console.log($('#slots' + index));
-                  //$("#id_time").html(data);  // replace the contents of the city input with the data that came from the server
 
      },
         failure: function(json) {
@@ -66,4 +63,35 @@ function get_count(index, day) {
 
      });
 
+}
+
+$( function() {
+   $( "#date-filter" ).datepicker({
+     dateFormat: 'yy-mm-dd',
+     changeMonth: true,
+     changeYear: true,
+     onSelect: function() {
+         var date = $(this).datepicker('getDate');
+         var cal_table = document.getElementById("cal_table")
+         console.log(date);
+         for (var i = 0; i< cal_table.rows.length -1; i++) {
+           var day = new Date($("#id_form-" + i + "-day").val())
+           console.log(typeof Date);
+           if (day < date) {
+              $(cal_table.rows[i+1]).css({"display": "none"})
+            }
+           else {$(cal_table.rows[i+1]).css({"display": "table-row"})}
+}
+}
+});
+});
+
+
+function reset_dates() {
+  var cal_table = document.getElementById("cal_table")
+  $('#date-filter').val('')
+      for (var i = 0; i< cal_table.rows.length -1; i++) {
+        $(cal_table.rows[i+1]).css({"display": "table-row"})
+
+}
 }

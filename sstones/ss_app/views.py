@@ -73,36 +73,19 @@ class CalView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(CalView, self).get_context_data(**kwargs)
 
-        requests = Appointment.objects.filter\
-        (Q(time__available="R") | Q(time__available="B", time__assigned_to=None))
-
-        formset = CalUpdateFormSet(queryset=Days.objects.filter\
-        (day__gte=datetime.datetime.now().date()))
-
-        #formset = CalUpdateFormSet(queryset=Days.objects.filter\
-        #(day='2018-12-20'))
-
-
-        appointment_list = self.get_appt_list()
-
-        coverage_list = []
-        for client in Client.objects.all():
-            if client.coverage == None:
-                coverage_list.append(client)
-
-        print ('coverage', coverage_list)
+        data = self.get_data()
 
         context.update({
-        'requests': requests,
-        'appointments': appointment_list,
-        'formset': formset,
-        'coverage_list': coverage_list,
+        'requests': data[1],
+        'appointments': data[0],
+        'formset': data[2],
+        'coverage_list': data[3],
         })
 
         return context
 
 
-    def get_appt_list(self):
+    def get_data(self):
         appointment_list = []
 
         for appt in Appointment.objects.filter(date__lte=datetime.datetime.now().date(), \
@@ -113,7 +96,21 @@ class CalView(LoginRequiredMixin, TemplateView):
             else:
                 appointment_list.append(appt)
 
-        return appointment_list
+        requests = Appointment.objects.filter\
+        (Q(time__available="R") | Q(time__available="B", time__assigned_to=None))
+
+        start_date = datetime.datetime.now().date()
+
+        formset = CalUpdateFormSet(queryset=Days.objects.filter\
+        (day__gte=start_date))
+
+
+        coverage_list = []
+        for client in Client.objects.all():
+            if client.coverage == None:
+                coverage_list.append(client)
+
+        return appointment_list, requests, formset, coverage_list
 
 
     def post(self, request, **kwargs):
@@ -129,45 +126,27 @@ class CalView(LoginRequiredMixin, TemplateView):
             print ("CalView error", formset.errors)
             message = formset.errors
 
-        appointment_list = self.get_appt_list()
-        requests = Appointment.objects.filter\
-        (Q(time__available="R") | Q(time__available="B", time__assigned_to=None))
+        data = self.get_data()
 
-        formset = CalUpdateFormSet(queryset=Days.objects.filter\
-        (day__gte=datetime.datetime.now().date()))
-
-        return render (request, 'ss_app/days_list.html', {'requests': requests,
-                                                          'appointments': appointment_list,
-                                                          'formset': formset,
+        return render (request, 'ss_app/days_list.html', {'requests': data[1],
+                                                          'appointments': data[0],
+                                                          'formset': data[2],
+                                                          'coverage_list': data[3],
                                                           'message': message,
                                                             })
 
 
-def cal_get_mtg_cnt(request):
+def refresh_cal(request):
     if request.is_ajax():
-        day = request.GET.get('day')
+        start_day = datetime.datetime.strptime(request.GET.get('day')[:-40], "%a %b %d %Y")
 
-        count_list = []
-        if TimeSlots.objects.filter(day__day=day, available__in=['B', 'R']).exists():
-            slot  = TimeSlots.objects.filter(day__day=day, available__in=['B', 'R']).values('day__day', 'day_id').annotate(count=Count('available'))
+        end_day = start_day + datetime.timedelta(weeks=2)
+        days_list = []
 
-        #date = slot['day__day']
-            print ('slot', slot)
-            print ('count', slot[0].get('count'))
-            print ('date', slot[0].get('day__day'))
-            print ('date', slot[0].get('day_id'))
-        #print (date.strftime('%Y-%M-%D'))
-
-        #count_list.append(date)
-            count_list.append(str(slot[0].get('day__day')))
-            count_list.append(str(slot[0].get('day_id')))
-            count_list.append(slot[0].get('count'))
-        else:
-            count_list.append(day)
-            day = Days.objects.get(day=day)
-            count_list.append(day.pk)
-            count_list.append(0)
-        data = json.dumps(count_list)
+        days = Days.objects.filter(day__gte=start_day, day__lte=end_day).values('pk', 'str__day', 'closed', 'note')
+        days_list.append(list(days))
+        print(days_list)
+        data = json.dumps(list(days_list))
         return HttpResponse(data, content_type="application/json")
 
     else:
@@ -177,11 +156,38 @@ def cal_get_mtg_cnt(request):
     return
 
 
+def cal_get_mtg_cnt(request):
+        if request.is_ajax():
+            day = request.GET.get('day')
 
+            count_list = []
+            if TimeSlots.objects.filter(day__day=day, available__in=['B', 'R']).exists():
+                slot  = TimeSlots.objects.filter(day__day=day, available__in=['B', 'R']).values('day__day', 'day_id').annotate(count=Count('available'))
 
+            #date = slot['day__day']
+                print ('slot', slot)
+                print ('count', slot[0].get('count'))
+                print ('date', slot[0].get('day__day'))
+                print ('date', slot[0].get('day_id'))
+            #print (date.strftime('%Y-%M-%D'))
 
+            #count_list.append(date)
+                count_list.append(str(slot[0].get('day__day')))
+                count_list.append(str(slot[0].get('day_id')))
+                count_list.append(slot[0].get('count'))
+            else:
+                count_list.append(day)
+                day = Days.objects.get(day=day)
+                count_list.append(day.pk)
+                count_list.append(0)
+            data = json.dumps(count_list)
+            return HttpResponse(data, content_type="application/json")
 
-
+        else:
+            print ('not ajax')
+            raise Http404
+        print ('bad call', request)
+        return
 
 
 
@@ -409,22 +415,6 @@ class AppointmentCreateView(CreateView):
                     notes = Notes()
                     notes.appointment = appt
                     notes.save()
-
-            #     elif slot.available in ['B', 'R']:
-            #         print ('form slot', form.instance.time.pk)
-            #         new_slot = TimeSlots()
-            #         new_slot.day = form.instance.time.day
-            #         new_slot.start_time = form.instance.time.start_time
-            #         new_slot.end_time = form.instance.time.end_time
-            #         new_slot.available = "R"
-            #         #new_slot.assigned_to = client.coverage
-            #         new_slot.save()
-            #         print ('new slot', new_slot.pk)
-            #
-            #         appt = appt_form.save(commit=False)
-            #         appt.client=client
-            #         appt.time = new_slot
-            #         appt.save()
             else:
                 appt = appt_form.save(commit=False)
                 appt.client=client
@@ -514,7 +504,6 @@ class AppointmentUpdateView(LoginRequiredMixin, UpdateView):
                #reset original time slot to open if changed
                if orig_slot.pk != slot.pk:
                    orig_slot.available = "O"
-                   #orig_slot.assigned_to = None
                    orig_slot.save()
                    add_to_cal(orig_slot)
 
@@ -554,12 +543,7 @@ class AppointmentDeleteView(LoginRequiredMixin, DeleteView):
           orig_slot.save()
           add_to_cal(orig_slot)
 
-          #if TimeSlots.objects.filter(day=orig_slot.day, start_time=orig_slot.start_time).count() > 1:
-        #      TimeSlots.objects.filter(day=orig_slot.day, start_time=orig_slot.start_time, available="O").latest('created').delete()
-
-
           return super(AppointmentDeleteView, self).post(self, request, **kwargs)
-          #return HttpResponseRedirect(reverse('ss_app:detail', kwargs={'pk':day.pk}))
 
 
 def load_slots(request):
@@ -628,6 +612,7 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
         #'client': data[0],
         'notes_formset': data[1],
         'old_notes': data[2],
+        'upcoming_meetings': data[3]
         })
         return context
 
@@ -651,15 +636,7 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
         data = self.build_view()
         print (data)
 
-#return render(request, 'ss_app/slots_dropdown_list_options.html', {'slots':slot_list})
         return HttpResponseRedirect(reverse_lazy('ss_app:update_client', args=[instance.pk]))
-        #return render(request, ('ss_app/client_form.html',
-        #            {'notes_formset': data[1],
-        #             'old_notes': data[2],
-                     #'client': data[0],
-                     #'appts': appts,
-            #         'message':message
-        #    }))
 
 
     def build_view(self, **kwargs):
@@ -672,7 +649,9 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
 
         old_notes = Notes.objects.filter(appointment__client=client).exclude(items_discussed__isnull=True)
 
-        return (client, notes_formset, old_notes)
+        upcoming_meetings = Appointment.objects.filter(client=client, date__gte=datetime.datetime.now())
+
+        return (client, notes_formset, old_notes, upcoming_meetings)
 
 
 class ClientDeleteView(LoginRequiredMixin, DeleteView):

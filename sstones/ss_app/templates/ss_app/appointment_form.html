@@ -11,6 +11,7 @@
 {% block body_block%}
 {%load bootstrap%}
 
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 <link rel="stylesheet" href={%static "css/appt.css" %}>
 <script type="text/javascript" src="{%static 'js/appt.js'%}"></script>
 
@@ -39,6 +40,7 @@
         <br>
         <form method="POST" id="appt_form" data-slots-url="{% url 'ajax_load_slots'%}" enctype="multipart/form-data">
         {%csrf_token%}
+
         {{client.email|bootstrap}}
         {{client.name|bootstrap}}
         {{client.phone|bootstrap}}
@@ -53,6 +55,7 @@
       <br>
       <p>{{form.date|bootstrap}}</p>
       <p>{{form.time|bootstrap}}</p>
+      <p> <i class="fas fa-info-circle"></i> For other start times, please add in Comments</p>
       <p>{{form.location|bootstrap}}</p>
       </div>
     </div>

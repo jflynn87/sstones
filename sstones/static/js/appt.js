@@ -91,33 +91,6 @@ $(function() {
 })
 
 
-//
-// $(document).ready(function() {
-//     console.log('page ready 1', $("#id_date").innerHTML);
-//     console.log($('#id_time').val());
-//     if ($('#id_date').innerHTML === undefined && $('#id_date').val() === '' || $('#id_time').val() != '') {
-//       console.log("empty date");
-//     }
-//     else {
-//     console.log($('#id_date').val());
-//     var url = $("#appt_form").attr("data-slots-url");
-//     var dayId = $('#id_date').val();
-//
-//     $.ajax({
-//       url: url,
-//       data: {
-//         'day': dayId
-//       },
-//
-//         success: function (data) {
-//         $("#id_time").html(data);
-//
-//      }
-//        });
-//
-//      };
-// });
-
 $( function() {
   $("#id_email").change(function () {
     console.log("email changed");
@@ -145,7 +118,6 @@ $( function() {
        });
  });
 });
-
 
 
 

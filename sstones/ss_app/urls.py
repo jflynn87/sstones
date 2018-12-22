@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^ajax/get_client/$', views.get_client, name='get_client'),
     url(r'^ajax/appt_get_client/$', views.appt_get_client, name='appt_get_client'),
     url(r'^ajax/cal_get_mtg_cnt/$', views.cal_get_mtg_cnt, name='cal_get_mtg_cnt'),
+    url(r'^ajax/refresh_cal/$', views.refresh_cal, name='refresh_cal'),
 
 
 ]

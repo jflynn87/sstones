@@ -15,15 +15,15 @@
  {%if not form.instance.pk%}
   <h3>Error - no meeting details</h3>
   {%else%}
-
-<h2>Client: <a href="{% url 'ss_app:update_client' pk=client.pk %}">  {{client.name}}</h2></a>
+<h2>Meeting Booking/Update Page</h2>
+<h4>Client: <a href="{% url 'ss_app:update_client' pk=client.pk %}">  {{client.name}}</h4></a>
 
 <br>
 
 <form method="POST" id="appt_form" data-slots-url="{% url 'ajax_load_slots'%}" enctype="multipart/form-data">
   {%csrf_token%}
 <p>{{form.date|bootstrap}}</p>
-<p>{{form.time|bootstrap}}  Original Booking:  {{appt.time.start_time}} with {{appt.time.assigned_to}}</p>
+<p>{{form.time|bootstrap}}  Original Booking:  {{appt.time.start_time}} with {{appt.time.assigned_to}}, status: {{appt.time.get_available_display}}</p>
 <p>{{form.location|bootstrap}}</p>
 {{form.comments|bootstrap}}
         <button type="submit" class="btn btn-primary submit">Click to Book</button>

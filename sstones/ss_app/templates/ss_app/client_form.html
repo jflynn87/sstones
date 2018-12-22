@@ -4,7 +4,7 @@
 
 
 {%block tittle_block%}
-  <title>Add Client - Stepping Stones</title>
+  <title>Clients - Stepping Stones</title>
 {%endblock%}
 
 
@@ -17,7 +17,16 @@
 {%if not form.instance.pk%}
     <h2>Create New Client</h2>
   {%else%}
-    <h2>Update Client Details</h2>
+    <h2>Client Update Page:  {{client}}</h2>
+  {%endif%}
+
+  {%if upcoming_meetings%}
+  <h4>Upcoming Meetings</h4>
+  <ul>
+    {%for meeting in upcoming_meetings%}
+    <li> <a href="{%url 'ss_app:update_appt' pk=meeting.pk %}"> {{meeting.date}} at {{meeting.time}}</a></li>
+    {%endfor%}
+  </ul>
   {%endif%}
 
 <form method="post">
