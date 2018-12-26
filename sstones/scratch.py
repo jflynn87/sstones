@@ -13,7 +13,10 @@ from email.mime.image import MIMEImage
 
 def run():
 
+    print ('days', Days.objects.all().count())
+    print ('slots', TimeSlots.objects.all().count())
 
+    print (TimeSlots.objects.all().count() / Days.objects.all().count())
 
     #these were commented            #msg = EmailMessage(mail_content, 'steppingstonetk.gmail.com',['steppingstonetk@gmail.com'],['jflynn87@hotmail.com'])
     #these were commented            #mail_recipients = ['steppingstonetk@gmail.com'],['jflynn87@hotmail.com'], ['jrc7825@gmail.com']
