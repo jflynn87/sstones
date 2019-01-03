@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{%load staticfiles%}
+
+{%block tittle_block%}
+  <title>Career Counciling - Stepping Stones</title>
+{%endblock%}
+
+{% block body_block%}
+
+<link rel="stylesheet" href={%static "css/index1.css" %}>
+<hr>
+
+<div class="row-1">
+
+<div itemscope itemtype="http://schema.org/Organization" class="intro_left">
+  <h2>Career Advice and Consulting </h2>
+  <h4 class="intro">Achieve Success with Professional Guidance</h4>
+</div>
+<div class="intro_right">
+  <h2>For Students and Professionals</h2>
+</div>
+</div>
+
+<div class="background">
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>  
+
+</div>
+
+<div class="row-2">
+   <!-- <div class="pic"> -->
+    <!-- <img id='picture' src={%static 'images/stairs2.jpg'%} alt=""> -->
+
+    <!-- <div class="message"> -->
+        <div class="row">
+
+        <div class="left">
+
+          <h2 class="blink_me_left">Mission</h2>
+          <h5 class="text">Leveraging our fifty plus years of international experience working for multinational companies,
+             we strive to help professionals of all levels become more successful in their careers.
+          </h5>
+        </div>
+
+        <div class="center">
+          <h2 class="blink_me_left">Let Us Help You!</h2>
+          <h5 class="text">Every career has its ups and downs.
+            Whether you want to build a plan to get to the next level,
+             or want to overcome a challenging situation or period of adversity,
+             professional experience will help you reach your goals.</h5>
+
+        </div>
+    </div>
+    </br>
+    <div class="mobile">
+      <div class="m-left">
+        <h2 class="blink_me_left">Mission</h2>
+        <h5 class="text">Leveraging our fifty plus years of international experience working for multinational companies,
+           we strive to help professionals of all levels become more successful in their careers.
+        </h5>
+      </div>
+      <div class="m-center">
+        <h2 class="blink_me_left">Let Us Help You!</h2>
+        <h5 class="text">Every career has its ups and downs.
+            Whether you want to build a plan to get to the next level,
+             or want to overcome a challenging situation or period of adversity,
+             professional experience will help you reach your goals.</h5>
+      </div>
+    </div>
+
+    <div class="row-1">
+      <div class="intro_left">
+
+
+
+    <a href="{% url 'ss_app:services' %}"><button class='btn btn-outline-secondary btn-block' type="button" >------- Service Offerings -------</button></a>
+      </div>
+      <div class="intro_right">
+
+
+    <a href="{% url 'ss_app:appt' %}"> <button class='btn btn-outline-secondary btn-block' type="button" >------- Contact Us ------- </button></a>
+    </div>
+    </div>
+</div>
+<br>
+
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Organization",
+  "name": "Stepping Stones Tokyo",
+  "description": "Career Consulting Services",
+  "url": "https://www.steppingstonestk.com",
+  "location": {
+   "@type": "place",
+   "address": {
+     "@type": "PostalAddress",
+     "addressLocality": "Tokyo",
+     "addressRegion": "Japan"
+   			}
+   },
+     "founders": {
+     "@type": "person",
+     "name": ["John Flynn", "Jimmy Carlberg"]
+     }
+}
+</script>
+
+{%endblock%}

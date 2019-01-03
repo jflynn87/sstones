@@ -22,6 +22,7 @@ from ss_app import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^$', views.index,name='index'),
+    url(r'^index1$', views.index1,name='index1'),
     url(r'^ss_app/',include('ss_app.urls',namespace='ss_app')),
     path("ajax/load-slots/",views.load_slots,name='ajax_load_slots')
 ]
