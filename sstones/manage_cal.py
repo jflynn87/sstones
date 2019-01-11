@@ -1,12 +1,19 @@
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE","sstones.settings")
 
+from dotenv import load_dotenv
+project_folder = os.path.expanduser('~')
+load_dotenv(os.path.join(project_folder, '.env'))
+
+SECRET_KEY = os.environ['SECRET_KEY']
+
 import django
 django.setup()
 
 from ss_app.models import Days, TimeSlots, Staff, Appointment
-from django.core.mail import send_mail, EmailMultiAlternatives, EmailMessage
+from django.core.mail import send_mail
 import datetime
+from oauth2client import file, client, tools
 
 
 def setup_cal():
@@ -87,10 +94,6 @@ def setup_cal():
             print ('delete day', date)
             del_days_list.append(date)
             Days.objects.get(pk=date.pk).delete()
-
-
-    total_days = Days.objects.all().count()
-    total_slots =  TimeSlots.objects.all().count()
 
     check_sum = (TimeSlots.objects.all().count() / Days.objects.all().count())
 

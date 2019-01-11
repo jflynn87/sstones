@@ -1,0 +1,23 @@
+3	  50-Years-Experience
+3	  Seat-at-the-Table
+3	  Global
+3   Regional
+2   Tokyo
+2   New York
+2   London
+2   Bengaluru
+2   Impact
+2   Strategy
+2   Influence
+2   Senior-Mindset
+1   Management
+1   Technology
+1   Operations
+1   Coach
+1   Goldman Sachs
+1   Experience
+1   Mentoring
+1   Managing Director
+
+
+site - https://www.wordclouds.com/
