@@ -13,8 +13,6 @@ django.setup()
 from ss_app.models import Days, TimeSlots, Staff, Appointment
 from django.core.mail import send_mail
 import datetime
-from oauth2client import file, client, tools
-
 
 def setup_cal():
     '''adds a new day and time slots to the calendar.  Deletes old days
@@ -30,26 +28,20 @@ def setup_cal():
     print ('start date(max date + 1)', start_date)
     end_date = datetime.datetime.now().date() + datetime.timedelta(days=180)
     print ('end (new date)', end_date)
-    #start_date = datetime.datetime.now().date()
-    #end_date = datetime.datetime.now().date() + datetime.timedelta(days=180)
 
     days = {}
     date = start_date
 
     while date <= end_date:
 
-        #if date.weekday() != 7:
             hours = []
             time = datetime.datetime.strptime(start_time, '%H:%M')
             end = datetime.datetime.strptime(end_time, '%H:%M')
             while time <= end:
-                #if date.weekday() not in [6]:
                     hours.append(time.strftime("%H:%M"))
                     days[str(date)]=hours
                     time += datetime.timedelta(minutes=slot_time)
                     date += datetime.timedelta(days=1)
-                #else:
-                #    date += datetime.timedelta(days=1)
 
     add_day_list = []
     for day, times in days.items():
@@ -65,8 +57,6 @@ def setup_cal():
         print ("saving day: ", days.day)
         days.save()
 
-        #staff = Staff.objects.get(name="Unassigned")
-
         for time in times:
             for person in Staff.objects.all():
                 slots = TimeSlots()
@@ -75,11 +65,8 @@ def setup_cal():
                 end_time = datetime.datetime.strptime(time, '%H:%M')
                 end_time += datetime.timedelta(minutes=50)
                 slots.end_time = end_time
-
                 slots.available = "O"
                 slots.assigned_to = person
-
-                #slots.objects.get_or_create(day=days,start_time=time,end_time='a',open=True)
                 slots.save()
 
     old_dates = Days.objects.filter(day__lt=datetime.datetime.today())
@@ -103,9 +90,6 @@ def setup_cal():
     else:
         msg = "Looks like an issue with the number of slots, not checking out"
 
-
-
-
     mail_sub = "SS dates updated"
     mail_content = "Summary of updates from date process: " + "\r" \
     "start date: " + str(start_date)  + "\r" \
@@ -115,10 +99,7 @@ def setup_cal():
     "deleted days: " + str(del_days_list) + "\r" \
     + msg
 
-    #these work
     mail_recipients = ['jflynn87@hotmail.com']
     send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
-
-
 
 setup_cal()
