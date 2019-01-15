@@ -95,7 +95,7 @@ class AppointmentForm(ModelForm):
         self.fields['location'].initial = 1
 
 
-        
+
 
 
         if 'date' in self.data:
@@ -132,21 +132,6 @@ class AppointmentForm(ModelForm):
             except Exception as e:
                 print (e)
                 self.errors['date'] = ["Please choose another date, or email us for help."]
-
-
-            # try:
-            #     if cleaned_data.get('date') < datetime.datetime.now().date():
-            #         print ('raising date error')
-            #         self.errors['date'] = ['Invalid date.  Please choose a future date']
-            #     else:
-            #         if cleaned_data.get('time') == None:
-            #             print ('time error')
-            #             self.errors['time'] = ['Please select a time from the list']
-            # except Exception as e:
-            #         self.errors['date'] = ['Invalid date.  Please enter a valid date']
-            #         print ('date exception', e)
-            #
-
 
         return cleaned_data
 
@@ -192,14 +177,7 @@ class CreateClientForm(ModelForm):
 
 
         class Meta:
-            #CHOICES = ()
-            #for focus in FocusAreas.objects.all():
-            #    choice = (focus.focus_area, focus.focus_area)
-            #    CHOICES = CHOICES + (choice,)
-            #print ('choices', CHOICES)
-
             model = Client
-            #exclude = ('focus_areas','coverage')
             fields = "__all__"
             widgets = {
             'focus_areas': forms.CheckboxSelectMultiple(choices=FocusAreas.objects.all())
@@ -209,20 +187,10 @@ class CreateClientForm(ModelForm):
         def __init__(self, *args, **kwargs):
             super(CreateClientForm, self).__init__(*args, **kwargs)
 
-            #focus_list = []
-            #client = Client.objects.get(pk=self.instance.pk)
-            #print (type(client.focus_areas))
-
-            #for focus in client.focus_areas:
-            #    focus_list.append(focus)
-            #print (focus_list)
             self.fields['phone'].required = False
             self.fields['focus_areas'].required = False
             self.fields['coverage'].required = False
-            #self.fields['focus_areas'].initial = (focus for fa in focus_list)
 
-#            self.fields['focus_areas'] = MultipleChoiceField(widget=forms.CheckboxSelectMultiple,
-#                                             choices=CHOICES)
 
 class CreateNotesForm(ModelForm):
         class Meta:
@@ -233,16 +201,6 @@ class CreateNotesForm(ModelForm):
             super().__init__(*args, **kwargs)
             self.fields['appointment'].disabled = True
             self.fields['appointment'].required = False
-            #self.fields['items_discussed'].required = False
-            #self.fields['follow_ups'].required = False
-            #self.fields['paid'].required = False
-            #if self.instance.appointment != None:
-            #    print ('form', self.instance.appointment.date)
-            #    if self.instance.appointment.date > datetime.datetime.now().date():
-            #        print ('false', self.instance.appointment.date)
-            #        self.fields['focus_areas'].reqired = False
-            #        self.fields['items_discussed'].reqired = False
-            #        self.fields['follow_ups'].reqired = False
 
         def clean(self):
             cleaned_data = super(CreateNotesForm, self).clean()
