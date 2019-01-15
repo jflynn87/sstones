@@ -18,6 +18,13 @@ hr {
     position: flex;
 }
 
+
+#teampic {
+    height: 100%%;
+    width: 96%;
+
+}
+
 #pop {
   position: flex;
 
@@ -64,18 +71,40 @@ footer .footer {
   flex: 5%;
 }
 .desc {
-  flex: 70%;
-/*  background-color: lightblue;*/
-  border: 1px;
+  flex: 40%;
+  border: 0px;
   border-radius: 25px;
   border-style:  solid;
   /*border-color: #0044cc;*/
   border-color: black;
   padding-left: 15px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 100%;
+
+}
+
+.right {
+  flex: 30%;
+/*  background-color: lightblue;*/
+  /*border: 1px;*/
+  /*border-radius: 25px;*/
+  /*border-style:  solid;*/
+  /*border-color: #0044cc;*/
+  /*border-color: black;*/
+  padding-left: 15px;
   padding-top: 10px;
-  background-image: url("/static/images/duderunning.jpg")
+  padding-bottom: 5px;
+  background-image: url("/static/images/map.jpg");
+  background-size: contain;
+  background-repeat: no-repeat;
 
 
+
+}
+
+.break {
+  flex: 5%;
 }
 
 .intro {
@@ -121,6 +150,13 @@ h4 {
     display: relative;
     height: 25%;
   }
+
+#teampic {
+      height: 100%%;
+      width: 96%;
+
+  }
+
 
 #body-img {
     width:  100%;

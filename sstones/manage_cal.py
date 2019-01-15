@@ -92,8 +92,8 @@ def setup_cal():
 
     mail_sub = "SS dates updated"
     mail_content = "Summary of updates from date process: " + "\r" \
-    "start date: " + str(start_date)  + "\r" \
-    "end date: " + str(end_date) + "\r" \
+    "max DB date: " + str(start_date)  + "\r" \
+    "today + 180 days: " + str(end_date) + "\r" \
     "added dates: " + str(add_day_list) + "\r" \
     "keep days: " + str(keep_days_list)  + "\r" \
     "deleted days: " + str(del_days_list) + "\r" \
