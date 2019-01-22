@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm, MultipleChoiceField
 from .models import Days, TimeSlots, Event, Appointment, Staff, Client, Notes,\
-                FocusAreas
+                FocusAreas, Package, Invoice, Receipt
 import datetime
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
@@ -13,6 +13,10 @@ from django.core.exceptions import ObjectDoesNotExist
 
 
 from django.utils.safestring import mark_safe
+from django.db.models import Max
+from django.conf import settings
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
 
 
 class CalUpdateForm(forms.ModelForm):
@@ -178,7 +182,8 @@ class CreateClientForm(ModelForm):
 
         class Meta:
             model = Client
-            fields = "__all__"
+            #fields = "__all__"
+            fields  = ['name', 'email', 'phone', 'coverage', 'package', 'focus_areas' ]
             widgets = {
             'focus_areas': forms.CheckboxSelectMultiple(choices=FocusAreas.objects.all())
             }
@@ -195,7 +200,7 @@ class CreateClientForm(ModelForm):
 class CreateNotesForm(ModelForm):
         class Meta:
             model = Notes
-            fields = ['appointment', 'items_discussed', 'follow_ups', 'paid']
+            fields = ['appointment', 'items_discussed', 'follow_ups']
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
@@ -213,3 +218,72 @@ class CreateNotesForm(ModelForm):
 
 
 CreateNotesFormSet = modelformset_factory(Notes, form=CreateNotesForm, extra=0)
+
+class CreatePackageForm(ModelForm):
+    class Meta:
+        model = Package
+        fields = "__all__"
+
+class CreateInvoiceForm(ModelForm):
+    class Meta:
+        model = Invoice
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        #try:
+        client_key = kwargs.pop('client')
+        print (client_key)
+        client = Client.objects.get(pk=client_key)
+        #except Exception:
+        #    client = None
+        super(CreateInvoiceForm, self).__init__(*args, **kwargs)
+
+        if Invoice.objects.all().exists():
+            invoice_num = Invoice.objects.all().aggregate(Max('number'))
+            num = invoice_num.get('number__max') + 1
+        else:
+            num = 1
+        self.fields['number'].initial = num
+        self.fields['inv_date'].initial=datetime.date.today()
+        self.fields['client'].initial = client
+        self.fields['inv_date'].label = "Invoice Date"
+        self.fields['status'].initial = '1'
+        if client.package.num_of_sessions == 1:
+            self.fields['appointment'].queryset = Appointment.objects.filter(client=client)
+            self.fields['appointment'].initial = Appointment.objects.filter(client=client, date__lte=datetime.date.today()).latest('date')
+        else:
+            self.fields['appointment'].initial = None
+        self.fields['principle'].initial = client.package.price * .92
+        self.fields['tax'].initial = client.package.price * .08
+        self.fields['total'].initial = client.package.price
+        self.fields['package'].initial = client.package
+
+    def save(self):
+        if 'send' in self.data:
+            send_invoice(self.instance)
+        elif 'save' in self.data:
+            print ('save')
+
+        return super(CreateInvoiceForm, self).save()
+
+def send_invoice(invoice):
+    dir = settings.BASE_DIR + '/ss_app/templates/ss_app/'
+    msg_plain = render_to_string(dir + 'invoice_email.txt', {'invoice': invoice})
+    msg_html = render_to_string(dir + 'invoice_email.html', {'invoice': invoice})
+    print(msg_html)
+    send_mail("Stepping Stones Invoice ",
+    msg_plain,
+    "steppingstonetk.gmail.com",
+    [invoice.client.email],
+    html_message=msg_html,
+     )
+
+    return
+
+
+
+
+class CreateReceiptForm(ModelForm):
+    class Meta:
+        model = Receipt
+        fields = "__all__"

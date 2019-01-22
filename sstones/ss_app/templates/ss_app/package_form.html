@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+
+
+{%block tittle_block%}
+  <title>Packages - Stepping Stones</title>
+{%endblock%}
+
+
+{% block body_block%}
+{%load bootstrap%}
+{%if message%}
+  {{message}}
+{%endif%}
+
+{%if not form.instance.pk%}
+    <h2>Create New Packge</h2>
+{%else%}
+    <h2>Update Package</h2>
+{%endif%}
+
+
+<form method="post">
+  {%csrf_token%}
+{{form|bootstrap}}
+
+{%if not form.instance.pk%}
+    <button type="submit" class="btn btn-primary">Create Package</button>
+  {%else%}
+    <button type="submit" class="btn btn-primary">Update Package</button>
+{%endif%}
+</form>
+
+{%if form.instance.pk%}
+  <a href="{% url 'ss_app:delete_package' pk=form.instance.pk %}"> <button class="btn btn-danger">Click to Delete</button></a>
+{%endif%}
+
+
+
+{%endblock%}

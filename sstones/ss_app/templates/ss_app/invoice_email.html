@@ -1,0 +1,34 @@
+{%load staticfiles%}
+{%load static%}
+{% block body_block%}
+
+<h2>Stepping Stones Invoice</h2>
+<h5>Date: {{invoice.inv_date}}</h5>
+
+
+<h3>To:  {{invoice.client.name}}, </h3>
+<p>Product: {{invoice.package}}  </p>
+<p>Price: {{invoice.principle}}</p>
+<p>Consumption Tax:  {{invoice.tax}}</p>
+<p>Total: {{invoice.total}}</p>
+
+{%if invoice.note%}
+<p>{{invoice.note}}</p>
+{%endif%}
+
+<p>Thank you for using Stepping Stones Career Counciling Service.
+
+
+<h3>The Stepping Stones Team</h3>
+
+
+<p><img src="https://www.steppingstonestk.com/static/images/ss_logo.jpg" alt="no image"></p>
+<p>Our Office Location:</p>
+<p>プレミアムオフィス五反田</p>
+<p>品川区東五反田1-6-3　いちご東五反田ビル３階, 308</p>
+<p></p>
+<p>Premium Office, Ichigo Building, 3rd Floor, Room 308</p>
+<p>1 Chome, 6-3 Higashigotanda, Shinagawa-ku, Tokyo 141-0022</p>
+<a href="https://www.google.com/maps/search/?api=1&query=lat=35.627353,139.726217&query_place_id=ChIJQQauxPuKGGARLCopt0jqtxg">Open in Google Maps</a>
+
+{%endblock%}

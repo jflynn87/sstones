@@ -1,0 +1,10 @@
+{%load staticfiles%}
+{% block body_block%}
+<h1>Test email</h1>
+{{invoice.client.name}},
+{{invoice}}
+The Stepping Stones Team
+
+
+
+{%endblock%}

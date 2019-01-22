@@ -1,0 +1,32 @@
+{%extends "base.html"%}
+{%load staticfiles%}
+{%load bootstrap%}
+
+
+{%block tittle_block%}
+  <title>Confirm Delete Package</title>
+{%endblock%}
+
+
+{%block body_block%}
+
+<h1>Delete Package</h1>
+<h3>Package:  {{package.name}}</h3>
+<p>Type:  {{package.type}}</p>
+<p>Sessions:  {{package.num_of_sessions}}</p>
+<p>Duration:  {{package.mtg_duration}}</p>
+<p>Price:   {{package.price}}</p>
+<br>
+<br>
+<a href="{% url 'ss_app:package_list' %}"> <button class="btn btn-primary">Cancel</button></a>
+<br>
+<br>
+<form method="post">
+  {%csrf_token%}
+
+    <input type="submit" class="btn btn-danger" value="Delete Package">
+
+
+</form>
+
+{%endblock%}

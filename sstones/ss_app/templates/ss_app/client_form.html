@@ -18,8 +18,11 @@
     <h2>Create New Client</h2>
   {%else%}
     <h2>Client Update Page:  {{client}}</h2>
+    <a href="{%url 'ss_app:invoice_list'%}"> <button type="button" class="btn btn-primary">Invoice List</button></a>
+    <a href="{%url 'ss_app:add_invoice' client.pk %}"> <button type="button" class="btn btn-primary">Add Invoice</button></a>
   {%endif%}
-
+<br>
+<br>
   {%if upcoming_meetings%}
   <h4>Upcoming Meetings</h4>
   <ul>
@@ -37,7 +40,6 @@
       <th>Meeting Date</th>
       <th>Items Discussed</th>
       <th>Follow Ups</th>
-      <th>Payment Made?</th>
     </thead>
     <tbody>
   {{notes_formset.management_form}}
@@ -46,7 +48,6 @@
       <td>{{form.appointment}}</td>
       <td>{{form.items_discussed}}</td>
       <td>{{form.follow_ups}}</td>
-      <td>{{form.paid}}</td>
       <td hidden>{{form.id}}</td>
     </tr>
     {%endfor%}
@@ -58,14 +59,13 @@
     <button type="submit" class="btn btn-primary">Update Client</button>
 {%endif%}
 </form>
-
+<br>
 <h3>Historical Notes</h3>
 <table class="table">
   <thead>
     <th>Meeting Date</th>
     <th>Items Discussed</th>
     <th>Follow Ups</th>
-    <th>Payment Made?</th>
   </thead>
   <tbody>
 {%for note in old_notes%}
@@ -73,8 +73,6 @@
     <td>{{note.appointment}}</td>
     <td>{{note.items_discussed}}</td>
     <td>{{note.follow_ups}}</td>
-    <td>{{note.paid}}</td>
-
   </tr>
   {%endfor%}
 </tbody>

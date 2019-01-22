@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+
+
+{%block tittle_block%}
+  <title>Invoice List - Stepping Stones</title>
+{%endblock%}
+
+<h1>Invoice List</h1>
+
+{% block body_block%}
+
+<a href="{%url 'ss_app:add_invoice' %}"> <button type="button" class="btn btn-primary">Add Invoice</button></a>
+<table class="table">
+<thead>
+<th>Number</th>
+<th>Client</th>
+<th>Date</th>
+<th>Status</th>
+
+</thead>
+<tbody>
+  {%for invoice in object_list%}
+  <tr>
+    <td> <a href="{% url 'ss_app:update_invoice' pk=invoice.pk %}"> {{invoice.number}} </a></td>
+    <td>{{invoice.client}}</td>
+    <td>{{invoice.inv_date}}</td>
+    <td>{{invoice.get_status_display}}</td>
+
+  </tr>
+  {%endfor%}
+</tbody>
+</table>
+
+{%endblock%}

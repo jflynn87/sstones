@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+
+
+{%block tittle_block%}
+  <title>Invoices - Stepping Stones</title>
+{%endblock%}
+
+
+{% block body_block%}
+<script type="text/javascript" src="{%static 'js/create_invoice.js'%}"></script>
+{%load bootstrap%}
+{%if message%}
+  {{message}}
+{%endif%}
+
+{%if not form.instance.pk%}
+    <h2>Create New Invoice</h2>
+{%else%}
+    <h2>Client Invoice Page:  {{client}}</h2>
+{%endif%}
+
+
+<form method="post">
+  {%csrf_token%}
+  {{form|bootstrap}}
+
+  <button type="submit" name="save" class="btn btn-primary">Save Only</button>
+  <button type="submit" name="send" class="btn btn-primary">Save & Send Email</button>
+</form>
+{%endblock%}

@@ -68,12 +68,24 @@ class FocusAreas(models.Model):
     def __str__(self):
         return self.focus_area
 
+
+class Package(models.Model):
+    name = models.CharField(max_length=256)
+    type = models.CharField(max_length=30)
+    num_of_sessions = models.PositiveIntegerField()
+    mtg_duration = models.CharField(max_length=30)
+    price = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.name
+
 class Client(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=20, null=True)
     coverage = models.ForeignKey(Staff, on_delete=models.CASCADE, null=True)
     focus_areas = models.ManyToManyField(FocusAreas)
+    package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.name
@@ -102,7 +114,36 @@ class Notes(models.Model):
     note_date = models.DateField(auto_now_add=True)
     items_discussed = models.TextField(null=True)
     follow_ups = models.TextField(null=True)
-    paid = models.BooleanField(default=False)
+    #paid = models.BooleanField(default=False)
 
     def __str__(self):
         return  str(self.note_date)
+
+
+class Invoice(models.Model):
+    STATUS =(
+        ("1", "Issued"),
+        ("2", "Paid")
+    )
+
+    number = models.PositiveIntegerField(unique=True)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    package = models.ForeignKey(Package, on_delete=models.CASCADE, null=True)
+    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, blank=True, null=True)
+    status = models.CharField(max_length=30, choices=STATUS)
+    inv_date = models.DateField()
+    principle = models.FloatField()
+    tax = models.FloatField()
+    total = models.FloatField()
+    note = models.CharField(max_length=1000, blank=True)
+
+    def __str__(self):
+        return str(self.number) + ": " + str(self.client)
+
+class Receipt(models.Model):
+    number = models.PositiveIntegerField(unique=True)
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
+    paid_date = models.DateField()
+
+    def __str__(self):
+        return str(self.number) + ": " + str(invoice)

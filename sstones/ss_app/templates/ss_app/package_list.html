@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+
+
+{%block tittle_block%}
+  <title>Package List - Stepping Stones</title>
+{%endblock%}
+
+<h1>Package List</h1>
+
+{% block body_block%}
+<br>
+<a href="{%url 'ss_app:add_package' %}"> <button type="button" class="btn btn-primary">Create Package</button></a>
+<br>
+<br>
+<table class="table">
+  <thead>
+    <th>Name</th>
+    <th>Type</th>
+    <th>Number of Sessions</th>
+    <th>Meeting Duration</th>
+    <th>Price</th>
+  </thead>
+  <tbody>
+{%for package in package_list%}
+  <tr>
+    <td><a href="{%url 'ss_app:update_package' pk=package.pk%}">{{package.name}}</a></td>
+    <td>{{package.type}}</td>
+    <td>{{package.num_of_sessions}}</td>
+    <td>{{package.mtg_duration}}</td>
+    <td>{{package.price}}</td>
+  </tr>
+  {%endfor%}
+</tbody>
+</table>
+
+{%endblock%}

@@ -2,9 +2,10 @@ from __future__ import print_function
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CreateEvent, SlotsForm, AppointmentForm, UserCreateForm,\
    CreateClientForm, CreateNotesForm, CreateNotesFormSet, SlotsFormSet, CalUpdateFormSet, \
-   CalUpdateForm
+   CalUpdateForm, CreatePackageForm, CreateInvoiceForm, CreateReceiptForm
 from django.http import HttpResponseRedirect, HttpResponse
-from .models import Event, Appointment, TimeSlots, Days, Staff, Client, Notes
+from .models import Event, Appointment, TimeSlots, Days, Staff, Client, Notes, \
+                    Invoice, Receipt, Package
 import datetime
 from django.views.generic import TemplateView, DetailView, ListView,\
  UpdateView, DeleteView, CreateView, View, FormView
@@ -230,23 +231,15 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
                 else:
                    if slot.available != cd.get('available') and \
                       cd.get('available') == "B":
-                      #slot.available = cd.get('available')
-                      #slot.assigned_to = cd.get('assigned_to')
-                      #slot.comments = cd.get('comments')
                       slot.update(available=cd.get('available'), comments=cd.get('comments'))
                       add_to_cal(slot)
                       send_client_email(slot)
                    else:
                       slot.available = cd.get('available')
-                      #slot.assigned_to = cd.get('assigned_to')
                       slot_assigned_to = slot.assigned_to
                       slot.comments = cd.get('comments')
-                      #slot.update(available=cd.get('available'), comments=cd.get('comments'))
                       slot.save()
                       add_to_cal(slot)
-
-                 #  if TimeSlots.objects.filter(day=cd['day'], start_time=cd['start_time'], available="O").count() > 1:
-                #       TimeSlots.objects.filter(day=cd['day'], start_time=cd['start_time'], available="O").latest('created').delete()
 
                    message = 'Updates Successful'
         else:
@@ -424,9 +417,6 @@ class AppointmentCreateView(CreateView):
                 appt.client=client
                 appt.save()
 
-
-            #subject = "SS web form submitted" + form.instance.pk
-
             mail_sub = "SS web form submitted: " + str(form.instance.date) + str(client.name)
             mail_from = "From: "+ client.name
             mail_email = "   Email: " + client.email
@@ -440,11 +430,6 @@ class AppointmentCreateView(CreateView):
                              mail_slot +
                              mail_msg )
 
-    #these were commented            #msg = EmailMessage(mail_content, 'steppingstonetk.gmail.com',['steppingstonetk@gmail.com'],['jflynn87@hotmail.com'])
-    #these were commented            #mail_recipients = ['steppingstonetk@gmail.com'],['jflynn87@hotmail.com'], ['jrc7825@gmail.com']
-
-
-            #these work
             mail_recipients = ['steppingstonetk@gmail.com'],['jflynn87@hotmail.com'], ['jrc7825@gmail.com']
             if settings.DEBUG == False:
                 send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
@@ -522,8 +507,6 @@ class AppointmentUpdateView(LoginRequiredMixin, UpdateView):
 class AppointmentDeleteView(LoginRequiredMixin, DeleteView):
       login_url='/ss_app/login'
       model = Appointment
-      #form_class = AppointmentForm
-      #template_name = "ss_app/appointment_confirm_delete.html"
       success_url = reverse_lazy("ss_app:calendar")
 
       def get_context_data(self, **kwargs):
@@ -543,7 +526,6 @@ class AppointmentDeleteView(LoginRequiredMixin, DeleteView):
           orig_slot = TimeSlots.objects.get(pk=appt.time.pk)
           #reset attached slot
           orig_slot.available = "O"
-          #orig_slot.assigned_to = None
           orig_slot.save()
           add_to_cal(orig_slot)
 
@@ -711,3 +693,104 @@ class NotesCreateView(LoginRequiredMixin, CreateView):
              'client': client,
              'appts': appts,
              'message':message})
+
+class InvoiceCreateView(LoginRequiredMixin, CreateView):
+    login_url='/ss_app/login'
+    model = Invoice
+    form_class = CreateInvoiceForm
+    success_url = '/ss_app/invoice_list'
+
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super(InvoiceCreateView, self).get_form_kwargs(*args, **kwargs)
+        form_kwargs['client'] = self.kwargs.get('pk')
+        #print ('form kwargs', form_kwargs)
+        return form_kwargs
+
+
+class InvoiceUpdateView(LoginRequiredMixin, UpdateView):
+    login_url='/ss_app/login'
+    model = Invoice
+    form_class = CreateInvoiceForm
+    success_url = '/ss_app/invoice_list'
+
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super(InvoiceUpdateView, self).get_form_kwargs(*args, **kwargs)
+        invoice = Invoice.objects.get(pk=self.kwargs.get('pk'))
+
+        form_kwargs['client'] = invoice.client.pk
+
+        print ('form kwargs', form_kwargs)
+        return form_kwargs
+
+
+
+class InvoiceDeleteView(LoginRequiredMixin, DeleteView):
+    login_url='/ss_app/login'
+    model = Invoice
+    success_url = reverse_lazy('ss_app:invoice_list')
+
+
+class InvoiceListView(LoginRequiredMixin, ListView):
+    login_url='/ss_app/login'
+    model = Invoice
+
+
+# class InvoiceReviewView(LoginRequiredMixin, DetailView):
+#     login_url='/ss_app/login'
+#     model = Invoice
+#     template_name = 'ss_app/review_invoice.html'
+#
+#     def get_context_data(self, *args, **kwargs):
+#         context = super(InvoiceReviewView, self).get_context_data(*args, **kwargs)
+#         print (kwargs)
+#         return context
+
+
+class PackageCreateView(LoginRequiredMixin, CreateView):
+    login_url='/ss_app/login'
+    model = Package
+    form_class = CreatePackageForm
+    success_url = '/ss_app/package_list'
+
+
+class PackageUpdateView(LoginRequiredMixin, UpdateView):
+    login_url='/ss_app/login'
+    model = Package
+    form_class = CreatePackageForm
+    success_url = '/ss_app/package_list'
+
+
+class PackageDeleteView(LoginRequiredMixin, DeleteView):
+    login_url='/ss_app/login'
+    model = Package
+    success_url = reverse_lazy('ss_app:package_list')
+
+
+class PackageListView(LoginRequiredMixin, ListView):
+    login_url='/ss_app/login'
+    model = Package
+
+
+class ReceiptCreateView(LoginRequiredMixin, CreateView):
+    login_url='/ss_app/login'
+    model = Package
+    form_class = CreatePackageForm
+    success_url = '/ss_app/package_list'
+
+
+class ReceiptUpdateView(LoginRequiredMixin, UpdateView):
+    login_url='/ss_app/login'
+    model = Package
+    form_class = CreatePackageForm
+    success_url = '/ss_app/package_list'
+
+
+class ReceiptDeleteView(LoginRequiredMixin, DeleteView):
+    login_url='/ss_app/login'
+    model = Package
+    success_url = reverse_lazy('ss_app:package_list')
+
+
+class ReceiptListView(LoginRequiredMixin, ListView):
+    login_url='/ss_app/login'
+    model = Package
