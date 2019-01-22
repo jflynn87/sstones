@@ -102,6 +102,7 @@ class AppointmentForm(ModelForm):
 
 
 
+
         if 'date' in self.data:
             try:
                date = self.data.get('date')
@@ -195,6 +196,7 @@ class CreateClientForm(ModelForm):
             self.fields['phone'].required = False
             self.fields['focus_areas'].required = False
             self.fields['coverage'].required = False
+            self.fields['package'].required= False
 
 
 class CreateNotesForm(ModelForm):
