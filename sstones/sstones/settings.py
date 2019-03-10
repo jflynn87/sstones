@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrapform',
     'multiforloop',
+    'django.contrib.humanize',
     'ss_app',
 ]
 

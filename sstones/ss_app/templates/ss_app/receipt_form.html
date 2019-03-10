@@ -1,0 +1,35 @@
+{%extends "base.html"%}
+{%load staticfiles%}
+{%load static%}
+
+{%block tittle_block%}
+  <title>Receipts - Stepping Stones</title>
+{%endblock%}
+
+{% block body_block%}
+{%load bootstrap%}
+<script type="text/javascript" src="{%static 'js/receipt_form.js'%}"></script>
+
+
+{%if message%}
+  {{message}}
+{%endif%}
+
+{%if not form.instance.pk%}
+    <h2>Create New Receipt</h2>
+{%else%}
+    <h2>Client Receipt Page:  {{receipt.invoice.client}}</h2>
+{%endif%}
+
+
+<form method="post">
+  {%csrf_token%}
+  {{form|bootstrap}}
+
+    <button type="submit" name="save" class="btn btn-primary">Save Only</button>
+    <button type="submit" name="send" class="btn btn-primary">Save & Send Email</button>
+  </form>
+
+
+
+{%endblock%}

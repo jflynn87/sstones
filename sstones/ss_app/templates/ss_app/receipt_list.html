@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+
+
+{%block tittle_block%}
+  <title>Receipt List - Stepping Stones</title>
+{%endblock%}
+
+<h1>Receipt List</h1>
+
+{% block body_block%}
+
+{%if client%}
+<h3>Client: {{client.name}}</h3>
+<h5>Total Meeting Count: {{meetings.date__count}}  </h5>
+<br>
+<a href="{%url 'ss_app:add_receipt' pk=client.pk %}"> <button type="button" class="btn btn-primary">Add Receipt</button></a>
+
+{%else%}
+<a href="{%url 'ss_app:add_receipt' %}"> <button type="button" class="btn btn-primary">Add Receipt</button></a>
+{%endif%}
+<table class="table">
+<thead>
+<th>Number</th>
+<th>Client</th>
+<th>Paid Date</th>
+<th>Invoice</th>
+
+
+</thead>
+<tbody>
+  {%for receipt in object_list%}
+  <tr>
+    <td> <a href="{% url 'ss_app:update_receipt' pk=receipt.pk %}"> {{receipt.number}} </a></td>
+    <td>{{receipt.invoice.client}}</td>
+    <td>{{receipt.paid_date}}</td>
+    <td><a href="{% url 'ss_app:update_invoice' pk=receipt.invoice.pk %}"> inv #: {{receipt.invoice.number}}, pkg name: {{receipt.invoice.package.name}} </a></td>
+
+  </tr>
+  {%endfor%}
+</tbody>
+</table>
+
+{%endblock%}

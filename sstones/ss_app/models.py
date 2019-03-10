@@ -132,13 +132,13 @@ class Invoice(models.Model):
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, blank=True, null=True)
     status = models.CharField(max_length=30, choices=STATUS)
     inv_date = models.DateField()
-    principle = models.FloatField()
-    tax = models.FloatField()
-    total = models.FloatField()
+    principal = models.IntegerField()
+    tax = models.IntegerField()
+    total = models.IntegerField()
     note = models.CharField(max_length=1000, blank=True)
 
     def __str__(self):
-        return str(self.number) + ": " + str(self.client)
+        return str(self.inv_date) + ": " + str(self.client)
 
 class Receipt(models.Model):
     number = models.PositiveIntegerField(unique=True)
@@ -146,4 +146,4 @@ class Receipt(models.Model):
     paid_date = models.DateField()
 
     def __str__(self):
-        return str(self.number) + ": " + str(invoice)
+        return str(self.number)

@@ -17,9 +17,7 @@
 {%if not form.instance.pk%}
     <h2>Create New Client</h2>
   {%else%}
-    <h2>Client Update Page:  {{client}}</h2>
-    <a href="{%url 'ss_app:invoice_list'%}"> <button type="button" class="btn btn-primary">Invoice List</button></a>
-    <a href="{%url 'ss_app:add_invoice' client.pk %}"> <button type="button" class="btn btn-primary">Add Invoice</button></a>
+    <h2>Client Info Update Page:  {{client}}</h2>
   {%endif%}
 <br>
 <br>
@@ -35,52 +33,10 @@
 <form method="post">
   {%csrf_token%}
 {{form|bootstrap}}
-  <table class="table">
-    <thead>
-      <th>Meeting Date</th>
-      <th>Items Discussed</th>
-      <th>Follow Ups</th>
-    </thead>
-    <tbody>
-  {{notes_formset.management_form}}
-  {%for form in notes_formset%}
-    <tr>
-      <td>{{form.appointment}}</td>
-      <td>{{form.items_discussed}}</td>
-      <td>{{form.follow_ups}}</td>
-      <td hidden>{{form.id}}</td>
-    </tr>
-    {%endfor%}
-    <br>
-</table>
 {%if not form.instance.pk%}
     <button type="submit" class="btn btn-primary">Create Client</button>
   {%else%}
     <button type="submit" class="btn btn-primary">Update Client</button>
 {%endif%}
 </form>
-<br>
-<h3>Historical Notes</h3>
-<table class="table">
-  <thead>
-    <th>Meeting Date</th>
-    <th>Items Discussed</th>
-    <th>Follow Ups</th>
-  </thead>
-  <tbody>
-{%for note in old_notes%}
-  <tr>
-    <td>{{note.appointment}}</td>
-    <td>{{note.items_discussed}}</td>
-    <td>{{note.follow_ups}}</td>
-  </tr>
-  {%endfor%}
-</tbody>
-</table>
-  <br>
-
-
-
-<br>
-<br>
 {%endblock%}

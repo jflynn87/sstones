@@ -41,7 +41,13 @@ function checkDate(date) {
 function getSlots() {
        var url = $("#appt_form").attr("data-slots-url");  // get the url of the `load_cities` view
        var dayId = $('#id_date').val();  // get the selected country ID from the HTML input
-       var client = $('#id_email').val()
+       if ($('#id_email').length) {
+          var client = $('#id_email').val()
+       }
+       else {
+         var client = $('#client_key').html()
+       }
+
        if ($("#add_appt").length) {
          var mode = "add"
        }
@@ -75,12 +81,12 @@ function getSlots() {
   };
 
 
-$( function() {
-   $("#id_date").change(function () {
-     getSlots()
-   });
- });
-
+//$( function() {
+//   $("#id_date").change(function () {
+//     getSlots()
+//   });
+// });
+//
 $(function() {
   $("#id_time").focus(function () {
     console.log("select");

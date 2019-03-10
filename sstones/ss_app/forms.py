@@ -10,6 +10,7 @@ from django.forms.formsets import BaseFormSet
 from django.forms import inlineformset_factory
 import ss_app.views
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import User
 
 
 from django.utils.safestring import mark_safe
@@ -17,6 +18,7 @@ from django.db.models import Max
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
+import manage_cal
 
 
 class CalUpdateForm(forms.ModelForm):
@@ -70,6 +72,16 @@ class SlotsForm(forms.ModelForm):
 
 SlotsFormSet = modelformset_factory(TimeSlots, SlotsForm, extra=0 )
 
+class SimpleApptform(ModelForm):
+
+    class Meta:
+        model=Appointment
+        fields= '__all__'
+        widgets = {'date': forms.TextInput({}),
+                    'time': forms.Select(attrs= {}),
+                    'comments': forms.Textarea(attrs= {'rows':3, 'cols':50, 'style': 'width: 100%'}),
+                    }
+
 
 class AppointmentForm(ModelForm):
 
@@ -82,6 +94,13 @@ class AppointmentForm(ModelForm):
                     }
 
     def __init__(self, *args, **kwargs):
+#        print ('appt form init', kwargs)
+#        self.request = kwargs.pop('request')
+#        print (self.request)
+#        if kwargs.get('user') != None:
+#            self.user = kwargs.pop('user')
+#        else:
+#            self.user = None
         super(AppointmentForm, self).__init__(*args, **kwargs)
         if not kwargs.get('instance'):
             self.fields['time'].queryset = TimeSlots.objects.none()
@@ -98,22 +117,22 @@ class AppointmentForm(ModelForm):
         self.fields['location'].required = False
         self.fields['location'].initial = 1
 
-
-
-
-
-
         if 'date' in self.data:
             try:
                date = self.data.get('date')
                if date != '':
                  self.fields['time'].queryset = TimeSlots.objects.filter(day=Days.objects.get(day=date))
             except Exception:
+               #user = User.objects.get(username=self.user)
+               #if user.is_superuser:
+            #       print ('create day')
+             #  else:
                self.errors['date'] = ['Invalid date.  Please enter a valid date']
 
 
     def clean(self, *args, **kwargs):
-        print (self.data)
+        #print ('clean', kwargs)
+        #user = User.objects.get(username=self.user)
         cleaned_data = super(AppointmentForm, self).clean()
 
         if cleaned_data.get('date') == None and cleaned_data['comments'] == '':
@@ -126,13 +145,21 @@ class AppointmentForm(ModelForm):
                 print (day)
                 if day.closed:
                     self.errors['date'] = ["We are closed that day, please choose another day or email us by clicking the link below."]
-                if day.day < datetime.datetime.now().date():
-                    self.errors['date'] = ['Invalid date.  Please choose a future date']
+                #if day.day < datetime.datetime.now().date() and not user.is_superuser:
+                #    self.errors['date'] = ['Invalid date.  Please choose a future date']
                 else:
                     if cleaned_data.get('time') == None:
                         self.errors['time'] = ['Please select a time from the list']
 
             except ObjectDoesNotExist:
+                # if self.user:
+                #     if user.is_superuser:
+                #         day = Days()
+                #         day.day = self.data.get('date')
+                #         day.closed = False
+                #         day.save()
+                #         manage_cal.setup_cal(cleaned_data.get('date'))
+                # else:
                 self.errors['date'] = ["Please contact us via email to schedule for that date."]
             except Exception as e:
                 print (e)
@@ -232,13 +259,42 @@ class CreateInvoiceForm(ModelForm):
         fields = "__all__"
 
     def __init__(self, *args, **kwargs):
-        #try:
-        client_key = kwargs.pop('client')
-        print (client_key)
-        client = Client.objects.get(pk=client_key)
-        #except Exception:
-        #    client = None
+        print ('init kw', kwargs)
+        if kwargs.get('client') != None:
+            client_key = kwargs.pop('client')
+            print ('client_key',client_key)
+            client = Client.objects.get(pk=client_key)
+        else:
+            kwargs.pop('client')
+            client = None
+
         super(CreateInvoiceForm, self).__init__(*args, **kwargs)
+
+        if client != None:
+            self.fields['client'].initial = client
+            try:
+                if client.package.num_of_sessions == 1:
+                    self.fields['appointment'].queryset = Appointment.objects.filter(client=client)
+                    self.fields['appointment'].initial = Appointment.objects.filter(client=client, date__lte=datetime.date.today()).latest('date')
+                else:
+                    self.fields['appointment'].initial = None
+                self.fields['principal'].initial = client.package.price * .92
+                self.fields['tax'].initial = client.package.price * .08
+                self.fields['total'].initial = client.package.price
+                self.fields['package'].initial = client.package
+
+            except Exception as e:
+                package = Package.objects.get(pk=1) #default is 1 off, hard coded pk.
+                self.fields['package'].initial = package
+
+                self.fields['principal'].initial = package.price * .92
+                self.fields['tax'].initial = package.price * .08
+                self.fields['total'].initial = package.price
+
+
+                print ('client package excption', e)
+
+
 
         if Invoice.objects.all().exists():
             invoice_num = Invoice.objects.all().aggregate(Max('number'))
@@ -247,18 +303,10 @@ class CreateInvoiceForm(ModelForm):
             num = 1
         self.fields['number'].initial = num
         self.fields['inv_date'].initial=datetime.date.today()
-        self.fields['client'].initial = client
+
         self.fields['inv_date'].label = "Invoice Date"
         self.fields['status'].initial = '1'
-        if client.package.num_of_sessions == 1:
-            self.fields['appointment'].queryset = Appointment.objects.filter(client=client)
-            self.fields['appointment'].initial = Appointment.objects.filter(client=client, date__lte=datetime.date.today()).latest('date')
-        else:
-            self.fields['appointment'].initial = None
-        self.fields['principle'].initial = client.package.price * .92
-        self.fields['tax'].initial = client.package.price * .08
-        self.fields['total'].initial = client.package.price
-        self.fields['package'].initial = client.package
+
 
     def save(self):
         if 'send' in self.data:
@@ -283,9 +331,56 @@ def send_invoice(invoice):
     return
 
 
-
-
 class CreateReceiptForm(ModelForm):
     class Meta:
         model = Receipt
         fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        print ('receipt init kw', kwargs)
+        if kwargs.get('client') != None:
+            client_key = kwargs.pop('client')
+            print ('client_key',client_key)
+            client = Client.objects.get(pk=client_key)
+        else:
+            kwargs.pop('client')
+            client = None
+
+        super(CreateReceiptForm, self).__init__(*args, **kwargs)
+        if client:
+            self.fields['invoice'].queryset = Invoice.objects.filter(client=client, status=1)
+        self.fields['paid_date'].initial = datetime.date.today()
+        if Receipt.objects.all().exists():
+            receipt_num = Receipt.objects.all().aggregate(Max('number'))
+            num = receipt_num.get('number__max') + 1
+        else:
+            num = 1
+        self.fields['number'].initial = num
+
+    def save(self):
+        if 'send' in self.data:
+            print ('instance', self.instance)
+            send_receipt(self.instance)
+
+        elif 'save' in self.data:
+            print ('save')
+
+        invoice = Invoice.objects.get(pk=self.instance.invoice.pk)
+        invoice.status = "2"
+        invoice.save()
+
+        return super(CreateReceiptForm, self).save()
+
+def send_receipt(receipt):
+    dir = settings.BASE_DIR + '/ss_app/templates/ss_app/'
+    msg_plain = render_to_string(dir + 'receipt_email.txt', {'receipt': receipt})
+    msg_html = render_to_string(dir + 'receipt_email.html', {'receipt': receipt})
+    print(msg_html)
+    send_mail("Stepping Stones Receipt ",
+    msg_plain,
+    "steppingstonetk.gmail.com",
+    [receipt.invoice.client.email],
+    html_message=msg_html,
+     )
+
+    return

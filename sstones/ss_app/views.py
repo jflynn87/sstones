@@ -27,6 +27,9 @@ from django.http import JsonResponse
 from django.core import serializers
 import json
 
+#from ss_app import manage_cal
+from manage_cal import setup_cal
+
 from django.template.loader import render_to_string
 
 # If modifying these scopes, delete the file token.json.
@@ -194,6 +197,25 @@ def cal_get_mtg_cnt(request):
         print ('bad call', request)
         return
 
+def get_invoices(request):
+    if request.is_ajax():
+        print (request.GET.get('filter'))
+        invoice_list = []
+        #invoice_tuple = ()
+        for invoice in Invoice.objects.all():
+            status = invoice.get_status_display()
+            invoice_tuple = (invoice.pk, invoice.client.name, str(invoice.inv_date), invoice.get_status_display())
+            invoice_list.append(invoice_tuple)
+        data = json.dumps(list(invoice_list))
+        return HttpResponse(data, content_type="application/json")
+
+    else:
+        print ('not ajax')
+        raise Http404
+    print ('bad call', request)
+    return
+
+
 
 
 class SlotsDetail(LoginRequiredMixin, TemplateView):
@@ -274,7 +296,7 @@ def send_client_email(slot):
 
 def add_to_cal(slot):
 
-
+    print ('add to cal', slot)
     store = file.Storage('token.json')
     creds = store.get()
     if not creds or creds.invalid:
@@ -309,9 +331,12 @@ def add_to_cal(slot):
             slot.save()
 
         except Exception as e:
-            print ('exception', e)
+            print ('cal create exception', e)
     elif slot.cal_event_id:
-        service.events().delete(calendarId='primary', eventId=slot.cal_event_id).execute()
+        try:
+            service.events().delete(calendarId='primary', eventId=slot.cal_event_id).execute()
+        except Exception as e:
+            print ('cal delete exception', e)
 
 
     return
@@ -356,6 +381,7 @@ def get_client(request):
 
 
 class AppointmentCreateView(CreateView):
+    #Intended for clients to create a meeting, for staff have a different view
     model = Appointment
     form_class = AppointmentForm
     success_url =  reverse_lazy('ss_app:thanks')
@@ -534,12 +560,21 @@ class AppointmentDeleteView(LoginRequiredMixin, DeleteView):
 
 def load_slots(request):
     print ('loadings slots')
-    print (request)
+    print (request.GET)
     date = request.GET.get('day')
     mode = request.GET.get('mode')
+    if Days.objects.filter(day=date).exists():
+        print ('date exists', date)
+    elif request.user.is_superuser:
+        setup_cal(str(date))
+
     slot_list = []
     try:
-        client = Client.objects.get(email=request.GET.get('client'))
+        if request.GET.get('client'):
+            client = Client.objects.get(pk=request.GET.get('client'))
+        else:
+            client = Client.objects.get(email=request.GET.get('client'))
+
         print (client.coverage)
         # for existing client with coverage assigned
         if client.coverage:
@@ -573,6 +608,93 @@ def load_slots(request):
 
     return render(request, 'ss_app/slots_dropdown_list_options.html', {'slots':slot_list})
 
+
+class MeetingCreateView(LoginRequiredMixin, CreateView):
+      #  used for staff to create meetings
+      login_url='/ss_app/login'
+      model = Appointment
+      template_name = "ss_app/update_appt_form.html"
+      success_url = reverse_lazy("ss_app:calendar")
+      form_class = AppointmentForm
+
+      # def get_form_kwargs(self):
+      #     kwargs = super(MeetingCreateView, self).get_form_kwargs()
+      #     kwargs.update({'user': self.request.user})
+      #     kwargs.update({'request': self.request})
+      #     print ('kwargs', kwargs)
+      #     return kwargs
+
+      def get_context_data(self, **kwargs):
+          context = super(MeetingCreateView, self).get_context_data(**kwargs)
+          client=Client.objects.get(pk=self.kwargs.get('pk'))
+          context.update({
+          'client': client
+          })
+
+          return context
+
+
+      def form_valid(self, request, **kwargs):
+
+        appt_form = AppointmentForm(self.request.POST)
+        print (appt_form)
+
+        if appt_form.is_valid():
+            #appt = appt_form.save(commit=False)
+            cd = appt_form.cleaned_data
+            appt = appt_form.save(commit=False)
+            appt.client = Client.objects.get(pk=self.kwargs.get('pk'))
+            appt.message_read = True
+            appt.save()
+
+            form_slot = cd.get('time')
+            slot = TimeSlots.objects.get(pk=form_slot.pk)
+            slot.available = "B"
+            slot.save()
+            add_to_cal(slot)
+            notes = Notes()
+            notes.appointment = appt
+            notes.save()
+
+
+
+            #print (self.kwargs)
+
+            # mail_sub = "SS web form submitted: " + str(form.instance.date) + str(client.name)
+            # mail_from = "From: "+ client.name
+            # mail_email = "   Email: " + client.email
+            # mail_msg = "   Message:  " + form.instance.comments
+            # mail_date =  "  Date: " +  str(form.instance.date)
+            # mail_slot = "  Slot:  " + str(form.instance.time)
+            #
+            # mail_content = (mail_from +
+            #                  mail_email +
+            #                  mail_date +
+            #                  mail_slot +
+            #                  mail_msg )
+            #
+            # mail_recipients = ['steppingstonetk@gmail.com'],['jflynn87@hotmail.com'], ['jrc7825@gmail.com']
+            # if settings.DEBUG == False:
+            #     send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
+            #
+            # print (appt.pk)
+            #appt_form.save()
+            #return super(MeetingCreateView, self).form_valid(request, **kwargs)
+            return HttpResponseRedirect(reverse_lazy('ss_app:calendar'))
+
+        else:
+            if self.request.user.is_superuser():
+                print ('form errors super', appt_form.errors)
+            else:
+                print ('these form errors', appt_form.errors)
+                #add client to context
+                return render (self.request, 'ss_app/update_appt_form.html', {                                                               'client': client_form,
+                                                                    'form': appt_form,
+                                                                    'errors': appt_form.errors
+                                                                            })
+
+
+
 class SignUp(CreateView):
     form_class = UserCreateForm
     success_url = reverse_lazy('login')
@@ -589,40 +711,18 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
     login_url='/ss_app/login'
     model = Client
     form_class = CreateClientForm
-    #success_url = reverse_lazy("ss_app:client_list")
+    success_url = reverse_lazy("ss_app:client_list")
 
     def get_context_data(self, **kwargs):
         context = super(ClientUpdateView, self).get_context_data(**kwargs)
         data = self.build_view()
         context.update({
         #'client': data[0],
-        'notes_formset': data[1],
-        'old_notes': data[2],
+        #'notes_formset': data[1],
+        #'old_notes': data[2],
         'upcoming_meetings': data[3]
         })
         return context
-
-    def post(self, request, **kwargs):
-        instance = get_object_or_404(Client, pk=kwargs.get('pk'))
-        client_form = CreateClientForm(self.request.POST or None, instance=instance)
-        notes_formset = CreateNotesFormSet(self.request.POST)
-
-        if notes_formset.is_valid() and client_form.is_valid():
-            for form in notes_formset:
-                if form.is_valid():
-                    form.save()
-                else:
-                    print ('invalid note form', form)
-            client_form.save()
-        else:
-
-            return
-            print ('invalid formset', notes_formset)
-
-        data = self.build_view()
-        print (data)
-
-        return HttpResponseRedirect(reverse_lazy('ss_app:update_client', args=[instance.pk]))
 
 
     def build_view(self, **kwargs):
@@ -660,51 +760,32 @@ class NotesCreateView(LoginRequiredMixin, CreateView):
         appts = Appointment.objects.filter(client=client, date__lte=datetime.datetime.now().date())
         notes =  Notes.objects.filter(appointment__in=appts).order_by('-appointment__date')
         formset = CreateNotesFormSet(queryset=notes)
-
+        print (appts)
         context.update({
         'client': client,
-        'appts': appts,
         'formset': formset
         })
 
         return context
 
 
-    def post(self, request, **kwargs):
-        print (request.POST)
-        print (kwargs)
-        formset = CreateNotesFormSet(request.POST)
-        print (Notes.objects.filter(appointment__client__pk=kwargs.get('pk')))
-
-        if formset.is_valid():
-            for form in formset:
-                if form.is_valid():
-                    print ('save')
-                    form.save()
-            return HttpResponseRedirect(self.success_url)
-
-        else:
-            print ('form issue', formset.errors)
-            client = Client.objects.get(pk=self.kwargs.get('pk'))
-            appts = Appointment.objects.filter(client=client, date__lte=datetime.datetime.now().date())
-            message = "Form errors"
-            return render(request, 'ss_app/notes_form.html',
-             {'formset': formset,
-             'client': client,
-             'appts': appts,
-             'message':message})
-
 class InvoiceCreateView(LoginRequiredMixin, CreateView):
     login_url='/ss_app/login'
     model = Invoice
     form_class = CreateInvoiceForm
-    success_url = '/ss_app/invoice_list'
+
 
     def get_form_kwargs(self, *args, **kwargs):
         form_kwargs = super(InvoiceCreateView, self).get_form_kwargs(*args, **kwargs)
         form_kwargs['client'] = self.kwargs.get('pk')
-        #print ('form kwargs', form_kwargs)
         return form_kwargs
+
+    def get_success_url(self, *args, **kwargs):
+        print ('success', self.kwargs)
+        if self.kwargs.get('pk') != None:
+            return reverse('ss_app:invoice_list', kwargs={'pk': self.kwargs.get('pk')})
+        else:
+            return reverse('ss_app:invoice_list')
 
 
 class InvoiceUpdateView(LoginRequiredMixin, UpdateView):
@@ -734,16 +815,25 @@ class InvoiceListView(LoginRequiredMixin, ListView):
     login_url='/ss_app/login'
     model = Invoice
 
+    def get_context_data(self, *args, **kwargs):
+        context = super(InvoiceListView, self).get_context_data(*args, **kwargs)
+        print (self.kwargs)
+        if self.kwargs.get('pk') != None:
+            client = Client.objects.get(pk=self.kwargs.get('pk'))
 
-# class InvoiceReviewView(LoginRequiredMixin, DetailView):
-#     login_url='/ss_app/login'
-#     model = Invoice
-#     template_name = 'ss_app/review_invoice.html'
-#
-#     def get_context_data(self, *args, **kwargs):
-#         context = super(InvoiceReviewView, self).get_context_data(*args, **kwargs)
-#         print (kwargs)
-#         return context
+            context.update({
+            'object_list': Invoice.objects.filter(client=client).order_by('-inv_date'),
+            'client': client,
+            'meetings': Appointment.objects.filter(client=client).aggregate(Count('date'))
+            })
+
+        else:
+            context.update({
+            'object_list': Invoice.objects.all().order_by('-inv_date'),
+
+            })
+
+        return context
 
 
 class PackageCreateView(LoginRequiredMixin, CreateView):
@@ -773,16 +863,34 @@ class PackageListView(LoginRequiredMixin, ListView):
 
 class ReceiptCreateView(LoginRequiredMixin, CreateView):
     login_url='/ss_app/login'
-    model = Package
-    form_class = CreatePackageForm
-    success_url = '/ss_app/package_list'
+    model = Receipt
+    form_class = CreateReceiptForm
+    success_url = '/ss_app/receipt_list'
+
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super(ReceiptCreateView, self).get_form_kwargs(*args, **kwargs)
+        form_kwargs['client'] = self.kwargs.get('pk')
+        return form_kwargs
+
+    def get_success_url(self, *args, **kwargs):
+        print ('success', self.kwargs)
+        if self.kwargs.get('pk') != None:
+            return reverse('ss_app:receipt_list', kwargs={'pk': self.kwargs.get('pk')})
+        else:
+            return reverse('ss_app:receipt_list')
 
 
 class ReceiptUpdateView(LoginRequiredMixin, UpdateView):
     login_url='/ss_app/login'
-    model = Package
-    form_class = CreatePackageForm
-    success_url = '/ss_app/package_list'
+    model = Receipt
+    form_class = CreateReceiptForm
+    success_url = '/ss_app/receipt_list'
+
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super(ReceiptUpdateView, self).get_form_kwargs(*args, **kwargs)
+        receipt = Receipt.objects.get(pk=self.kwargs.get('pk'))
+        form_kwargs['client'] = receipt.invoice.client.pk
+        return form_kwargs
 
 
 class ReceiptDeleteView(LoginRequiredMixin, DeleteView):
@@ -793,4 +901,25 @@ class ReceiptDeleteView(LoginRequiredMixin, DeleteView):
 
 class ReceiptListView(LoginRequiredMixin, ListView):
     login_url='/ss_app/login'
-    model = Package
+    model = Receipt
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(ReceiptListView, self).get_context_data(*args, **kwargs)
+        print (self.kwargs)
+        if self.kwargs.get('pk') != None:
+            client = Client.objects.get(pk=self.kwargs.get('pk'))
+            print ('appt count', Appointment.objects.filter(client=client).aggregate(Count('date')))
+
+            context.update({
+            'object_list': Receipt.objects.filter(invoice__client=client).order_by('-paid_date'),
+            'client': client,
+            'meetings': Appointment.objects.filter(client=client).aggregate(Count('date'))
+            })
+
+        else:
+            context.update({
+            'object_list': Receipt.objects.all().order_by('-paid_date'),
+
+            })
+
+        return context

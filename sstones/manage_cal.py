@@ -13,51 +13,52 @@ django.setup()
 from ss_app.models import Days, TimeSlots, Staff, Appointment
 from django.core.mail import send_mail
 import datetime
+from django.db.models import Max
 
-def setup_cal():
-    '''adds a new day and time slots to the calendar.  Deletes old days
-        where there were no meetings'''
+def setup_cal(new_date=None):
+    '''option to pass in a date to create or not.  If no date passed in, adds
+    dates new days up to 6 months from todat.  Creates time slots  for new
+    days and deletes old days with no meetings.'''
 
-    start_time = '9:00'
-    end_time = '20:00'
+    print ('starting')
+    open_time = '09:00'
+    close_time = '20:00'
     slot_time = 60
 
-    # Start date from today to next 5 day
-    start = Days.objects.latest('day')
-    start_date = start.day + datetime.timedelta(days=1)
-    print ('start date(max date + 1)', start_date)
-    end_date = datetime.datetime.now().date() + datetime.timedelta(days=180)
-    print ('end (new date)', end_date)
+    if new_date != None:
+        start_date = datetime.datetime.strptime(new_date, '%Y-%m-%d').date()
+        end_date = datetime.datetime.strptime(new_date, '%Y-%m-%d').date()
+    else:
+        start_date = datetime.datetime.now().date()
+        print ('start date(today)', start_date)
+        end_date = datetime.datetime.now().date() + datetime.timedelta(days=180)
+        print ('end (new date)', end_date)
 
-    days = {}
     date = start_date
+    add_day_list = []
 
     while date <= end_date:
-
-            hours = []
-            time = datetime.datetime.strptime(start_time, '%H:%M')
-            end = datetime.datetime.strptime(end_time, '%H:%M')
-            while time <= end:
-                    hours.append(time.strftime("%H:%M"))
-                    days[str(date)]=hours
-                    time += datetime.timedelta(minutes=slot_time)
-                    date += datetime.timedelta(days=1)
-
-    add_day_list = []
-    for day, times in days.items():
+      if not Days.objects.filter(day=date).exists():
+        hours = []
+        time = datetime.datetime.strptime(open_time, '%H:%M')
+        end = datetime.datetime.strptime(close_time, '%H:%M')
+        while time <= end:
+            hours.append(time.strftime("%H:%M"))
+            time += datetime.timedelta(minutes=slot_time)
 
         days = Days()
-        days.day = day
+        days.day = date
 
-        if datetime.datetime.strptime(day, '%Y-%m-%d').weekday() == 6:
+        if date.weekday() == 6:
             days.closed = True
         else:
             days.closed = False
-        add_day_list.append(days.day)
+
         print ("saving day: ", days.day)
         days.save()
+        add_day_list.append(days)
 
-        for time in times:
+        for time in hours:
             for person in Staff.objects.all():
                 slots = TimeSlots()
                 slots.day = days
@@ -69,37 +70,45 @@ def setup_cal():
                 slots.assigned_to = person
                 slots.save()
 
-    old_dates = Days.objects.filter(day__lt=datetime.datetime.today())
+      date += datetime.timedelta(days=1)
 
-    keep_days_list = []
-    del_days_list = []
-    for date in old_dates:
-        if Appointment.objects.filter(date=date.day).exists():
-            print ('keep day', date)
-            keep_days_list.append(date)
+    if new_date == None:
+        old_dates = Days.objects.filter(day__lt=datetime.datetime.today())
+
+        keep_days_list = []
+        del_days_list = []
+        for date in old_dates:
+            if Appointment.objects.filter(date=date.day).exists():
+                print ('keep day', date)
+                keep_days_list.append(date)
+            else:
+                print ('delete day', date)
+                del_days_list.append(date)
+                Days.objects.get(pk=date.pk).delete()
+
+        check_sum = (TimeSlots.objects.all().count() / Days.objects.all().count())
+
+        #12 slots a day, 2 staff so should = 24
+        if check_sum == 24:
+            msg = "Dates and slots look good"
         else:
-            print ('delete day', date)
-            del_days_list.append(date)
-            Days.objects.get(pk=date.pk).delete()
+            for day in Days.objects.all():
+                count = TimeSlots.objects.filter(day=day).count()
+                if count != 24:
+                    print ('bad day and slot count', day.day, count)
+            print (check_sum)
+            msg = "Looks like an issue with the number of slots, check logs for bad dates"
 
-    check_sum = (TimeSlots.objects.all().count() / Days.objects.all().count())
+        mail_sub = "SS dates updated"
+        mail_content = "Summary of updates from date process: " + "\r" \
+        "start date (today or passed day): " + str(start_date)  + "\r" \
+        "today + 180 days: " + str(end_date) + "\r" \
+        "added dates: " + str(add_day_list) + "\r" \
+        "keep days: " + str(keep_days_list)  + "\r" \
+        "deleted days: " + str(del_days_list) + "\r" \
+        + msg
 
-    #12 slots a day, 2 staff so should = 24
-    if check_sum == 24:
-        msg = "Dates and slots look good"
-    else:
-        msg = "Looks like an issue with the number of slots, not checking out"
+        mail_recipients = ['jflynn87@hotmail.com']
+        send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
 
-    mail_sub = "SS dates updated"
-    mail_content = "Summary of updates from date process: " + "\r" \
-    "max DB date: " + str(start_date)  + "\r" \
-    "today + 180 days: " + str(end_date) + "\r" \
-    "added dates: " + str(add_day_list) + "\r" \
-    "keep days: " + str(keep_days_list)  + "\r" \
-    "deleted days: " + str(del_days_list) + "\r" \
-    + msg
-
-    mail_recipients = ['jflynn87@hotmail.com']
-    send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
-
-setup_cal()
+#setup_cal()

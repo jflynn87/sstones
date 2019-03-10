@@ -12,12 +12,11 @@
 
 <script type="text/javascript" src="{%static 'js/appt.js'%}"></script>
 {%load bootstrap%}
- {%if not form.instance.pk%}
-  <h3>Error - no meeting details</h3>
-  {%else%}
 <h2>Meeting Booking/Update Page</h2>
+ {%if form.instance.pk or client%}
 <h4>Client: <a href="{% url 'ss_app:update_client' pk=client.pk %}">  {{client.name}}</h4></a>
-
+<p id='client_key' hidden>{{client.pk}}</p>
+{%endif%}
 <br>
 
 <form method="POST" id="appt_form" data-slots-url="{% url 'ajax_load_slots'%}" enctype="multipart/form-data">
@@ -30,6 +29,7 @@
 
 </form>
 <br>
+{%if form.instance.pk%}
 <a href="{% url 'ss_app:delete_appt' pk=form.instance.pk %}"> <button class="btn btn-danger">Click to Delete</button></a>
 {%endif%}
 

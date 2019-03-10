@@ -10,9 +10,26 @@
 <h1>Invoice List</h1>
 
 {% block body_block%}
+<script type="text/javascript" src="{%static 'js/invoice_list.js'%}"></script>
+{%if client%}
+<h3>Client: {{client.name}}</h3>
+<h5>Total Meeting Count: {{meetings.date__count}}  </h5>
 
+<br>
+<a href="{%url 'ss_app:add_invoice' pk=client.pk %}"> <button type="button" class="btn btn-primary">Add Invoice</button></a>
+
+{%else%}
 <a href="{%url 'ss_app:add_invoice' %}"> <button type="button" class="btn btn-primary">Add Invoice</button></a>
-<table class="table">
+{%endif%}
+<br>
+<br>
+<label for="filter">Filter Invoices</label>
+ <select id='filter' class="filter" name="">
+   <option class="filter_opt" value="All">All</option>
+   <option class="filter_opt" value="Issued">Issued</option>
+   <option class="filter_opt" value="Paid">Paid</option>
+</select>
+<table id="table" class="table">
 <thead>
 <th>Number</th>
 <th>Client</th>
@@ -26,7 +43,7 @@
     <td> <a href="{% url 'ss_app:update_invoice' pk=invoice.pk %}"> {{invoice.number}} </a></td>
     <td>{{invoice.client}}</td>
     <td>{{invoice.inv_date}}</td>
-    <td>{{invoice.get_status_display}}</td>
+    <td id="status">{{invoice.get_status_display}}</td>
 
   </tr>
   {%endfor%}

@@ -3,15 +3,16 @@
 {%load humanize%}
 {% block body_block%}
 
-<h2>Stepping Stones Invoice</h2>
-<h5>Date: {{invoice.inv_date}}</h5>
+<h2>Stepping Stones Receipt</h2>
+<h5>Date: {{receipt.paid_date}}</h5>
 
 
-<h3>To:  {{invoice.client.name}}, </h3>
-<p>Product: {{invoice.package}}  </p>
-<p>Price: ¥ {{invoice.principal|intcomma}}</p>
-<p>Consumption Tax:  ¥ {{invoice.tax|intcomma}}</p>
-<p>Total: ¥ {{invoice.total|intcomma}}</p>
+<h3>To:  {{receipt.invoice.client.name}}, </h3>
+<p>Please find confirmation of your payment:</p>
+<p>Product: {{receipt.invoice.package}}  </p>
+<p>Price: ¥ {{receipt.invoice.principal|intcomma}}</p>
+<p>Consumption Tax:  ¥ {{receipt.invoice.tax|intcomma}}</p>
+<p>Total: ¥ {{receipt.invoice.total|intcomma}}</p>
 
 {%if invoice.note%}
 <p>{{invoice.note}}</p>
