@@ -49,7 +49,9 @@
     {%csrf_token%}
   {{formset.management_form}}
   {%for form in formset%}
-  {{form.errors}}
+  {%if form.errors%}
+  <div class='alret alert-danger'>{{form.errors|escape}}</div>
+  {%endif%}
     <tr>
       <td>{{form.appointment}}</td>
       <td>{{form.items_discussed}}</td>

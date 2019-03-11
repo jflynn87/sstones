@@ -768,6 +768,23 @@ class NotesCreateView(LoginRequiredMixin, CreateView):
 
         return context
 
+    def post(self, request, **kwargs):
+          formset = CreateNotesFormSet(request.POST)
+          if formset.is_valid():
+              for form in formset:
+                  if form.is_valid():
+                     form.save()
+              return HttpResponseRedirect(reverse_lazy('ss_app:client_list'))
+          else:
+                print ('notes form errors', formset.errors)
+                client = Client.objects.get(pk=self.kwargs.get('pk'))
+                return render (self.request, 'ss_app/notes_form.html', {'formset': formset,
+                                                                    'client': client,
+                                                                    #'errors': form.errors
+                                                                            })
+          #return super(NotesCreateView, self).form_valid(self, request, **kwargs)
+
+
 
 class InvoiceCreateView(LoginRequiredMixin, CreateView):
     login_url='/ss_app/login'

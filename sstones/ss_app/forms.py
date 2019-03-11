@@ -236,14 +236,14 @@ class CreateNotesForm(ModelForm):
             self.fields['appointment'].disabled = True
             self.fields['appointment'].required = False
 
-        def clean(self):
-            cleaned_data = super(CreateNotesForm, self).clean()
-            if cleaned_data.get('items_discussed') == None:
-                self.errors['items_discussed'] = "Please enter data"
-            if cleaned_data.get('follow_ups') == None:
-                self.errors['follow_ups'] = "Please enter data"
-
-            return cleaned_data
+        # def clean(self):
+        #     cleaned_data = super(CreateNotesForm, self).clean()
+        #     if cleaned_data.get('items_discussed') == None:
+        #         self.errors['items_discussed'] = "Please enter data"
+        #     if cleaned_data.get('follow_ups') == None:
+        #         self.errors['follow_ups'] = "Please enter data"
+        #     print (cleaned_data, self.errors)
+        #     return cleaned_data
 
 
 CreateNotesFormSet = modelformset_factory(Notes, form=CreateNotesForm, extra=0)
