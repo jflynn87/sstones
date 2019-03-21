@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+
+
+{%block tittle_block%}
+  <title>Tasks - Stepping Stones</title>
+{%endblock%}
+
+{% block body_block%}
+{%load bootstrap%}
+
+{% if form.errors %}
+{% for field in form %}
+    {% for error in field.errors %}
+        <div class="alert alert-danger">
+            <strong id="errors">{{ error|escape }}</strong>
+        </div>
+    {% endfor %}
+{% endfor %}
+{% for error in form.non_field_errors %}
+    <div class="alert alert-danger">
+        <strong>{{ error|escape }}</strong>
+    </div>
+{% endfor %}
+{% endif %}
+
+{%if not form.instance.pk%}
+    <h2>Create New Task</h2>
+{%else%}
+    <h2>Udate Task</h2>
+{%endif%}
+
+
+<form method="post">
+  {%csrf_token%}
+{{form|bootstrap}}
+  <button type="submit" name="save" class="btn btn-primary">Save Task</button>
+</form>
+
+{%if form.instance.pk%}
+<a href="{% url 'ss_app:delete_task' pk=form.instance.pk %}"> <button class="btn btn-danger">Click to Delete</button></a>
+{%endif%}
+
+{%endblock%}

@@ -147,3 +147,13 @@ class Receipt(models.Model):
 
     def __str__(self):
         return str(self.number)
+
+class Task(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=3000)
+    closed = models.BooleanField(default=False)
+    create_date = models.DateField(auto_now_add=True)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return self.name

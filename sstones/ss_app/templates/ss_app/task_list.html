@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{%load static%}
+{%load staticfiles%}
+
+
+{%block tittle_block%}
+  <title>Tasks - Stepping Stones</title>
+{%endblock%}
+
+{% block body_block%}
+<h1>Task List</h1>
+<br>
+<a href="{%url 'ss_app:add_task'%}"><button type="button" class="btn btn-primary">Add New Task</button></a>
+<br>
+<br>
+<table class="table">
+  <thead>
+    <th>Task Name</th>
+    <th>Task Description</th>
+    <th>Task Create Date</th>
+    <th>Task Status</th>
+    <th>Client</th>
+  </thead>
+  <tbody>
+    {%for task in object_list%}
+    <tr>
+      <td> <a href="{%url 'ss_app:update_task' pk=task.pk %}">{{task.name}} </a></td>
+      <td>{{task.description}}</td>
+      <td>{{task.create_date}}</td>
+      {%if task.closed%}
+      <td>Closed</td>
+      {%else%}
+      <td>Open</td>
+      {%endif%}
+      <td>{{task.client.name}}</td>
+    </tr>
+    {%endfor%}
+  </tbody>
+</table>
+
+
+
+{%endblock%}

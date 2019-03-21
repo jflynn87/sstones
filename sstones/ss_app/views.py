@@ -2,10 +2,10 @@ from __future__ import print_function
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CreateEvent, SlotsForm, AppointmentForm, UserCreateForm,\
    CreateClientForm, CreateNotesForm, CreateNotesFormSet, SlotsFormSet, CalUpdateFormSet, \
-   CalUpdateForm, CreatePackageForm, CreateInvoiceForm, CreateReceiptForm
+   CalUpdateForm, CreatePackageForm, CreateInvoiceForm, CreateReceiptForm, TaskForm
 from django.http import HttpResponseRedirect, HttpResponse
 from .models import Event, Appointment, TimeSlots, Days, Staff, Client, Notes, \
-                    Invoice, Receipt, Package
+                    Invoice, Receipt, Package, Task
 import datetime
 from django.views.generic import TemplateView, DetailView, ListView,\
  UpdateView, DeleteView, CreateView, View, FormView
@@ -940,3 +940,25 @@ class ReceiptListView(LoginRequiredMixin, ListView):
             })
 
         return context
+
+class TaskListView(LoginRequiredMixin, ListView):
+    login_url='/ss_app/login'
+    model = Task
+
+class TaskCreateView(LoginRequiredMixin, CreateView):
+    login_url='/ss_app/login'
+    model = Task
+    form_class = TaskForm
+    success_url = reverse_lazy('ss_app:task_list')
+
+class TaskUpdateView(LoginRequiredMixin, UpdateView):
+    login_url='/ss_app/login'
+    model = Task
+    form_class = TaskForm
+    success_url = reverse_lazy('ss_app:task_list')
+
+
+class TaskDeleteView(LoginRequiredMixin, DeleteView):
+    login_url='/ss_app/login'
+    model = Task
+    success_url = reverse_lazy('ss_app:task_list')

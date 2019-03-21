@@ -1,0 +1,28 @@
+{%extends "base.html"%}
+{%load staticfiles%}
+{%load bootstrap%}
+
+
+{%block tittle_block%}
+  <title>Confirm Delete - Stepping Stones</title>
+{%endblock%}
+
+
+{%block body_block%}
+
+<h1>Delete Task</h1>
+<h3>Task:  {{task.name}}</h3>
+<br>
+<br>
+<a href="{% url 'ss_app:task_list' %}"> <button class="btn btn-primary">Cancel</button></a>
+<br>
+<br>
+<form method="post">
+  {%csrf_token%}
+
+    <input type="submit" class="btn btn-danger" value="Delete Activity">
+
+
+</form>
+
+{%endblock%}

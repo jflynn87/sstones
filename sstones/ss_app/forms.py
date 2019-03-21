@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm, MultipleChoiceField
 from .models import Days, TimeSlots, Event, Appointment, Staff, Client, Notes,\
-                FocusAreas, Package, Invoice, Receipt
+                FocusAreas, Package, Invoice, Receipt, Task
 import datetime
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
@@ -384,3 +384,14 @@ def send_receipt(receipt):
      )
 
     return
+
+class TaskForm(ModelForm):
+    class Meta:
+        model = Task
+        fields = "__all__"
+        widgets = {'description': forms.Textarea(attrs= {'rows':3, 'cols':50, 'style': 'width: 100%'}),
+                   }
+
+    def __init__(self, *args, **kwargs):
+        super(TaskForm, self).__init__(*args, **kwargs)
+        self.fields['client'].required = False
