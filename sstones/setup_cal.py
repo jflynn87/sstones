@@ -54,7 +54,7 @@ def setup_cal():
         #staff = Staff.objects.get(name="Unassigned")
 
         for time in times:
-            for person in Staff.objects.all():
+            for person in Staff.objects.filter(bookable=True):
                 slots = TimeSlots()
                 slots.day = days
                 slots.start_time = time
@@ -67,10 +67,11 @@ def setup_cal():
 
                 #slots.objects.get_or_create(day=days,start_time=time,end_time='a',open=True)
                 slots.save()
+                print ('save slot', slots)
 
 
 
 
 
-
+if __name__ == '__main__':
 setup_cal()

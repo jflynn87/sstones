@@ -21,7 +21,7 @@ class Days(models.Model):
 
 class Staff(models.Model):
     name = models.CharField(max_length=100)
-
+    bookable = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -151,6 +151,9 @@ class Receipt(models.Model):
 class Task(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=3000)
+    status = models.CharField(max_length=1000, null=True)
+    assigned_to = models.ForeignKey(Staff, on_delete=models.CASCADE, null=True)
+    target_date = models.DateField(null=True)
     closed = models.BooleanField(default=False)
     create_date = models.DateField(auto_now_add=True)
     client = models.ForeignKey(Client, on_delete=models.CASCADE, null=True)

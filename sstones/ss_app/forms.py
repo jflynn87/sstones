@@ -385,13 +385,22 @@ def send_receipt(receipt):
 
     return
 
+class DateInput(forms.DateInput):
+    input_type = 'date'
+
 class TaskForm(ModelForm):
     class Meta:
         model = Task
         fields = "__all__"
         widgets = {'description': forms.Textarea(attrs= {'rows':3, 'cols':50, 'style': 'width: 100%'}),
+                   'status': forms.Textarea(attrs= {'rows':3, 'cols':50, 'style': 'width: 100%'}),
+                   'target_date': DateInput(),
                    }
 
     def __init__(self, *args, **kwargs):
         super(TaskForm, self).__init__(*args, **kwargs)
         self.fields['client'].required = False
+        self.fields['status'].required = False
+        self.fields['status'].label = "Status/Follow Ups"
+        self.fields['assigned_to'].required = False
+        self.fields['assigned_to'].label = "Assigned To"

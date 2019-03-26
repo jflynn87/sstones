@@ -20,7 +20,7 @@ def setup_cal(new_date=None):
     dates new days up to 6 months from todat.  Creates time slots  for new
     days and deletes old days with no meetings.'''
 
-    print ('starting')
+    print ('new_date', new_date)
     open_time = '09:00'
     close_time = '20:00'
     slot_time = 60
@@ -59,7 +59,7 @@ def setup_cal(new_date=None):
         add_day_list.append(days)
 
         for time in hours:
-            for person in Staff.objects.all():
+            for person in Staff.objects.filter(bookable=True):
                 slots = TimeSlots()
                 slots.day = days
                 slots.start_time = time
@@ -69,6 +69,7 @@ def setup_cal(new_date=None):
                 slots.available = "O"
                 slots.assigned_to = person
                 slots.save()
+                print ('saving slot', slots)
 
       date += datetime.timedelta(days=1)
 
@@ -88,9 +89,10 @@ def setup_cal(new_date=None):
 
         check_sum = (TimeSlots.objects.all().count() / Days.objects.all().count())
 
-        #12 slots a day, 2 staff so should = 24
+        #12 slots a day, 2 staff so should = 24  Update to calculate automatically from staff len and hours
         if check_sum == 24:
             msg = "Dates and slots look good"
+            print (msg)
         else:
             for day in Days.objects.all():
                 count = TimeSlots.objects.filter(day=day).count()
@@ -111,4 +113,4 @@ def setup_cal(new_date=None):
         mail_recipients = ['jflynn87@hotmail.com']
         send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
 
-#setup_cal()
+setup_cal()
