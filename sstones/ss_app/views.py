@@ -656,30 +656,6 @@ class MeetingCreateView(LoginRequiredMixin, CreateView):
             notes.appointment = appt
             notes.save()
 
-
-
-            #print (self.kwargs)
-
-            # mail_sub = "SS web form submitted: " + str(form.instance.date) + str(client.name)
-            # mail_from = "From: "+ client.name
-            # mail_email = "   Email: " + client.email
-            # mail_msg = "   Message:  " + form.instance.comments
-            # mail_date =  "  Date: " +  str(form.instance.date)
-            # mail_slot = "  Slot:  " + str(form.instance.time)
-            #
-            # mail_content = (mail_from +
-            #                  mail_email +
-            #                  mail_date +
-            #                  mail_slot +
-            #                  mail_msg )
-            #
-            # mail_recipients = ['steppingstonetk@gmail.com'],['jflynn87@hotmail.com'], ['jrc7825@gmail.com']
-            # if settings.DEBUG == False:
-            #     send_mail(mail_sub, mail_content, 'steppingstonetk.gmail.com', mail_recipients)  #add fail silently
-            #
-            # print (appt.pk)
-            #appt_form.save()
-            #return super(MeetingCreateView, self).form_valid(request, **kwargs)
             return HttpResponseRedirect(reverse_lazy('ss_app:calendar'))
 
         else:
@@ -743,6 +719,7 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
 class ClientDeleteView(LoginRequiredMixin, DeleteView):
     login_url='/ss_app/login'
     model = Client
+    success_url = reverse_lazy("ss_app:client_list")
 
 class ClientListView(LoginRequiredMixin, ListView):
     login_url='/ss_app/login'

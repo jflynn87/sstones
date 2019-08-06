@@ -29,6 +29,7 @@
     <td><a href="{%url 'ss_app:add_notes' pk=client.pk%}"> <button type="button" class="btn btn-primary">Meeting Notes</button></a></td>
     <td><a href="{%url 'ss_app:invoice_list' pk=client.pk %}"> <button type="button" class="btn btn-primary">Invoices</button></a></td>
     <td><a href="{%url 'ss_app:receipt_list' pk=client.pk %}"> <button type="button" class="btn btn-primary">Receipts</button></a></td>
+    <td><a href="{%url 'ss_app:delete_client' pk=client.pk %}"> <button type="button" class="btn btn-danger">Delete</button></a></td>
   </tr>
   {%endfor%}
 </tbody>

@@ -37,6 +37,8 @@
     <button type="submit" class="btn btn-primary">Create Client</button>
   {%else%}
     <button type="submit" class="btn btn-primary">Update Client</button>
+
+    <a href="{%url 'ss_app:delete_client' pk=client.pk %}"> <button type="button" class="btn btn-danger">Confirm Delete</button></a>
 {%endif%}
 </form>
 {%endblock%}
