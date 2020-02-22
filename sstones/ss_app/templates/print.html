@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{%load static%}
+
+
+
+{%block tittle_block%}
+  <title>Print Notes - Stepping Stones</title>
+{%endblock%}
+
+
+{% block body_block%}
+{%load bootstrap%}
+
+
+{% if form.errors %}
+{% for error in form.non_field_errors %}
+    <div class="alert alert-danger">
+        <strong>{{ error|escape }}</strong>
+    </div>
+{% endfor %}
+{% for error in form.errors %}
+    <div class="alert alert-danger">
+        <strong>{{ error|escape }}</strong>
+    </div>
+{% endfor %}
+
+{% endif %}
+
+
+
+<h1>Print</h1>
+
+{%endblock%}

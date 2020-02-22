@@ -50,6 +50,7 @@ urlpatterns = [
     url(r'^ajax/cal_get_mtg_cnt/$', views.cal_get_mtg_cnt, name='cal_get_mtg_cnt'),
     url(r'^ajax/refresh_cal/$', views.refresh_cal, name='refresh_cal'),
     url(r'^ajax/get_invoices/$', views.get_invoices, name='get_invoices'),
+    url(r'^print_notes/(?P<pk>\d+)/$', views.PrintNotesView.as_view(), name='print_notes'),
 
 
 ]

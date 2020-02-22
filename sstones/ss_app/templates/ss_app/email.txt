@@ -1,4 +1,4 @@
-{%load staticfiles%}
+{%load static%}
 {% block body_block%}
 <h1>Test email</h1>
 {{appt.client.name}},

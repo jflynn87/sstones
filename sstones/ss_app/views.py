@@ -32,6 +32,14 @@ from manage_cal import setup_cal
 
 from django.template.loader import render_to_string
 
+#for printing
+#import reportlab
+#import io
+#from django.http import FileResponse
+#from reportlab.pdfgen import canvas
+
+
+
 # If modifying these scopes, delete the file token.json.
 SCOPES = 'https://www.googleapis.com/auth/calendar'
 
@@ -737,7 +745,7 @@ class NotesCreateView(LoginRequiredMixin, CreateView):
         appts = Appointment.objects.filter(client=client, date__lte=datetime.datetime.now().date())
         notes =  Notes.objects.filter(appointment__in=appts).order_by('-appointment__date')
         formset = CreateNotesFormSet(queryset=notes)
-        print (appts)
+        #print (formset)
         context.update({
         'client': client,
         'formset': formset
@@ -939,3 +947,43 @@ class TaskDeleteView(LoginRequiredMixin, DeleteView):
     login_url='/ss_app/login'
     model = Task
     success_url = reverse_lazy('ss_app:task_list')
+
+
+class PrintNotesView(LoginRequiredMixin, TemplateView):
+        pass
+    # login_url='/ss_app/login'
+    # template_name='/ss_app/print.html'
+    
+    
+    #def get_queryset(self, *args, **kwargs):
+    #    print (self.kwargs)
+        #return Notes.objects.filter(appointment__client__pk=self.kwargs.get('pk'))
+    #    print (Notes.objects.all())
+        
+    
+    # def get_context_data(self, *args, **kwargs):
+    #    context = super(PrintNotesView, self).get_context_data(*args, **kwargs)
+       
+    #    notes = Notes.objects.filter(appointment__client__pk=self.kwargs.get('pk'))
+    #    print ('notes', notes)
+
+    #    # Create a file-like buffer to receive PDF data.
+    #    buffer = io.BytesIO()
+
+    #     # Create the PDF object, using the buffer as its "file."
+    #    p = canvas.Canvas(buffer)
+
+    #     # Draw things on the PDF. Here's where the PDF generation happens.
+    #     # See the ReportLab documentation for the full list of functionality.
+    #    p.drawString(100, 100, "Notes ")
+
+    #     # Close the PDF object cleanly, and we're done.
+    #    p.showPage()
+    #    #p.save()
+    #    print (p)
+    #     # FileResponse sets the Content-Disposition header so that browsers
+    #     # present the option to save the file.
+    #    buffer.seek(0)
+    #    return FileResponse(buffer, as_attachment=True, filename='notes.pdf')
+
+       

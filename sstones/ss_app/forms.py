@@ -227,14 +227,21 @@ class CreateClientForm(ModelForm):
 
 
 class CreateNotesForm(ModelForm):
+
         class Meta:
             model = Notes
             fields = ['appointment', 'items_discussed', 'follow_ups']
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
-            self.fields['appointment'].disabled = True
-            self.fields['appointment'].required = False
+            try:
+                self.fields['appointment'].disabled = True
+                self.fields['appointment'].required = False
+                self.fields['appointment'].queryset = Appointment.objects.filter(pk=self.instance.appointment.pk)
+            except Exception as e:
+                print (self.instance.pk, e)
+            
+            
 
         # def clean(self):
         #     cleaned_data = super(CreateNotesForm, self).clean()
