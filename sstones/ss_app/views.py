@@ -28,7 +28,7 @@ from django.core import serializers
 import json
 
 #from ss_app import manage_cal
-from manage_cal import setup_cal
+from ss_app.update_ss_cal import setup_cal
 
 from django.template.loader import render_to_string
 
