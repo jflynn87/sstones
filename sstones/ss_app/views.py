@@ -262,14 +262,14 @@ class SlotsDetail(LoginRequiredMixin, TemplateView):
                    if slot.available != cd.get('available') and \
                       cd.get('available') == "B":
                       slot.update(available=cd.get('available'), comments=cd.get('comments'))
-                      add_to_cal(slot)
+                      #add_to_cal(slot)
                       send_client_email(slot)
                    else:
                       slot.available = cd.get('available')
                       slot_assigned_to = slot.assigned_to
                       slot.comments = cd.get('comments')
                       slot.save()
-                      add_to_cal(slot)
+                      #add_to_cal(slot)
 
                    message = 'Updates Successful'
         else:
@@ -522,13 +522,13 @@ class AppointmentUpdateView(LoginRequiredMixin, UpdateView):
                print ('slot save', slot)
                slot.save()
                send_client_email(slot)
-               add_to_cal(slot)
+               #add_to_cal(slot)
 
                #reset original time slot to open if changed
                if orig_slot.pk != slot.pk:
                    orig_slot.available = "O"
                    orig_slot.save()
-                   add_to_cal(orig_slot)
+                   #add_to_cal(orig_slot)
 
                return HttpResponseRedirect(reverse('ss_app:detail', kwargs={'pk':day.pk}))
            else:
@@ -561,7 +561,7 @@ class AppointmentDeleteView(LoginRequiredMixin, DeleteView):
           #reset attached slot
           orig_slot.available = "O"
           orig_slot.save()
-          add_to_cal(orig_slot)
+          #add_to_cal(orig_slot)
 
           return super(AppointmentDeleteView, self).post(self, request, **kwargs)
 
@@ -659,7 +659,7 @@ class MeetingCreateView(LoginRequiredMixin, CreateView):
             slot = TimeSlots.objects.get(pk=form_slot.pk)
             slot.available = "B"
             slot.save()
-            add_to_cal(slot)
+            #add_to_cal(slot)
             notes = Notes()
             notes.appointment = appt
             notes.save()
